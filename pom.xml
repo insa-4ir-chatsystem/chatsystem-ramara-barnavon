@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>fr.insa.appli</groupId>
-    <artifactId>Appli_Benevolat</artifactId>
+    <groupId>insa</groupId>
+    <artifactId>ChatSystem</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -49,7 +49,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>model.model.src.main.Main</mainClass>
+                            <mainClass>chatsystem.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
