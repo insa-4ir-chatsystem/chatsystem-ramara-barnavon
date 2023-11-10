@@ -7,14 +7,4 @@ public enum HeaderDatagram {
 
     ;
 
-    public static HeaderDatagram getHeader(String mess){
-        HeaderDatagram header = null;
-        try {
-            header = HeaderDatagram.valueOf(mess.substring(0, 4));
-        }catch (IllegalArgumentException e) {
-            System.out.println("Invalid header of message : "+mess);
-
-        }
-        return header;
-    }
 }
