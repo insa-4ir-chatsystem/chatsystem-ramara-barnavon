@@ -1,8 +1,13 @@
 package chatsystem;
 
+import chatsystem.ContactDiscoveryLib.ChatSystem;
+import chatsystem.ContactDiscoveryLib.Contact;
+
 import java.util.ArrayList;
 
 public class Main {
+
+    public static ArrayList<Integer> portList;
     public static void main(String[] args) {
 
         //TODO: Créer un contact à traver une méthode permettant de verif l'unicité
@@ -19,7 +24,7 @@ public class Main {
         int portZ = 2025;
         int portM = 1789;
 
-        ArrayList<Integer> portList = new ArrayList<Integer>();
+        portList = new ArrayList<Integer>();
         portList.add(portK);
         portList.add(portZ);
         portList.add(portJ);
@@ -50,8 +55,9 @@ public class Main {
             throw new RuntimeException(e);
         }
 
-        ChatJ.cm.afficherListe();
-        ChatM.cm.afficherListe();
+        ChatJ.afficherListeContacts();
+
+        ChatM.afficherListeContacts();
 
     }
 }

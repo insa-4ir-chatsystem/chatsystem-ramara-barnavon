@@ -1,4 +1,4 @@
-package chatsystem;
+package chatsystem.ContactDiscoveryLib;
 
 public class DatagramManager {
 
