@@ -1,0 +1,9 @@
+chatsystem/ContactDiscoveryLib/ContactsManager.class
+chatsystem/ContactDiscoveryLib/DatagramManager.class
+chatsystem/ContactDiscoveryLib/ChatSystem$UpdateContactsThread.class
+chatsystem/ContactDiscoveryLib/Contact.class
+chatsystem/ContactDiscoveryLib/HeaderDatagram.class
+chatsystem/ContactDiscoveryLib/ChatSystem.class
+chatsystem/ContactDiscoveryLib/ChatSystem$ListeningThread.class
+chatsystem/ContactDiscoveryLib/ChatSystem$1.class
+chatsystem/Main.class
