@@ -67,6 +67,7 @@ public class Contact {
         return "Contact{" +
                 "pseudo='" + pseudo + '\'' +
                 ", id=" + id +
+                ", ttl="+ TTL +
                 '}';
     }
 }

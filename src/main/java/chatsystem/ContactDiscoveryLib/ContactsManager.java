@@ -1,6 +1,7 @@
 package chatsystem.ContactDiscoveryLib;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class ContactsManager { // verif de la liste de contacts (expirations) toutes les 20s minimum
     private ArrayList<Contact> ContactList;
@@ -14,7 +15,7 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
     }
 
     public void setIdMax(int idMax) {
-        this.idMax = idMax;
+        this.idMax = Math.max(this.idMax, idMax);
     }
 
     public int getIdMax() {
@@ -25,18 +26,20 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
 
 
 
-    public void updateContact(Contact c) {
+    public synchronized void updateContact(Contact c) {
         if (ContactList.contains(c)) {
-            System.out.println("Déjà présent dans la liste, mise à jour du TTL");
+            //System.out.println("Déjà présent dans la liste, mise à jour du TTL");
             Contact contact = search_contact_by_id(c.getId());
             contact.setTTL(4);
         } else {
+            c.setTTL(4);
             ContactList.add(c);
+            //System.out.println("Add to contact list : " + c);
             this.idMax = Math.max(this.idMax, c.getId());
         }
     }
 
-    public Contact search_contact_by_id(int contact){
+    public synchronized Contact search_contact_by_id(int contact){
         for(Contact c : this.ContactList){
             if (c.getId() == (contact)){
                 return c;
@@ -45,7 +48,7 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
         return null;
     }
 
-    public Contact search_contact_by_pseudo(String contact){
+    public synchronized Contact search_contact_by_pseudo(String contact){
         for(Contact c : this.ContactList){
             if (c.getPseudo().equals(contact)){
                 return c;
@@ -54,18 +57,22 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
         return null;
     }
 
-    public void decreaseTTL(){
-        for(Contact c : this.ContactList){
+    public synchronized void decreaseTTL() {
+        Iterator<Contact> iterator = this.ContactList.iterator();
+        while (iterator.hasNext()) {
+            Contact c = iterator.next();
             c.decrementTTL();
-            if(c.getTTL() == 0){
-                ContactList.remove(c);
+            if (c.getTTL() <= 0) {
+                iterator.remove();
+                System.out.println("TTl expiré, contact retiré : " + c);
             }
         }
     }
 
-    public void afficherListe() {
+
+    public synchronized void afficherListe() {
         for (Contact contact : this.ContactList) {
-            System.out.println(contact);
+            System.out.println("    " + contact);
         }
     }
 }

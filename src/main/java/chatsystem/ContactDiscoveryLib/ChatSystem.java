@@ -79,6 +79,7 @@ public class ChatSystem { //instance de chat sur une machine
             }
         }
         if(IDAccepted){
+            System.out.println("Id accepté : " + id);
             return id;
         }else { return -1; }
         
@@ -97,7 +98,7 @@ public class ChatSystem { //instance de chat sur une machine
             throw new RuntimeException(e);
         }
         if(!pseudoAccepted){
-            System.out.println("Pseudo non disponible, fermeture du chat");
+            System.out.println("Pseudo " + pseudo + " non disponible, fermeture du chat");
             closeChat(); // Fermeture du chat, solution temporaire
         }
 
@@ -108,8 +109,10 @@ public class ChatSystem { //instance de chat sur une machine
         startListening();
         startUpdateContacts();
         int id = chooseID();
+        this.cm.setIdMax(id);
         String pseudo = choosePseudo(pseudoAsked);
-        this.monContact = new Contact(pseudo, id);
+        this.monContact = new Contact(pseudo, id, -1);
+        //System.out.println("Creation contact : " + this.monContact);
 
     }
 
@@ -220,13 +223,17 @@ public class ChatSystem { //instance de chat sur une machine
     }
 
     public void afficherListeContacts(){
+        System.out.println("Je suis " + monContact + " et ma liste :");
+        System.out.println("[");
         this.cm.afficherListe();
+        System.out.println("]");
     }
 
     public void closeChat(){
         LT.interrupt();
         UCT.interrupt();
-        System.exit(1);
+
+        //System.exit(1);
     }
 
 
@@ -236,22 +243,25 @@ public class ChatSystem { //instance de chat sur une machine
         public void run() {
             DatagramPacket rep;
             //System.out.println("je run un Thread de listen");
-            while(true){
-
+            while (!this.isInterrupted()) {
                 //System.out.println("debut while");
                 rep = listen(); //réécrire la rep et la renvoyer
                 //System.out.println("pdu reçu");
                 String msg = new String(rep.getData(), 0, rep.getLength());
-                switch(DatagramManager.getHeader(msg)){
+                switch (DatagramManager.getHeader(msg)) {
                     case INCO: // On reçoit une info de contact, il faut l'ajouter à notre liste de contacts
 
                         cm.updateContact(DatagramManager.INCO_to_Contact(msg));
+                        afficherListeContacts();
                         //System.out.println("Envoie Contact");
 
                         break;
                     case DECO: //On reçoit une demande de contact, on souhaite renvoyer notre contact au destinaire
                         //System.out.println("j'ai reçu DECO");
-                        send_INCO(rep);
+                        if (!(monContact == null)) {
+                            send_INCO(rep);
+                            //System.out.println("je suis " + monContact.getId() + " et j'envoie mon contact");
+                        }
                         //System.out.println("j'ai envoyé INCO");
                         break;
                     case REPS: // Si le pseudo demandé est refusé par un contact
@@ -259,16 +269,16 @@ public class ChatSystem { //instance de chat sur une machine
                         break;
                     case DEPS: //
                         String his_pseudo = DatagramManager.XXPS_to_pseudo(msg);
-                        if (cm.search_contact_by_pseudo(his_pseudo)!=null){ //Si l'id existe déjà
+                        if (cm.search_contact_by_pseudo(his_pseudo) != null || (monContact != null && his_pseudo == monContact.getPseudo())) { //Si le pseudo existe déjà
                             send_REPS(rep);
                         } //else on fait rien il ( il supposera que oui tant que personne lui dit non )
-                        send_REPS(rep);
+
                         break;
                     case DEID: //si l'ID existe il refuse avec un id_conseiller ( le max + 1 de sa liste ) si l'ID n'existe pas, il renvoie rien
                         int his_id = DatagramManager.XXID_to_id(msg);
-                        if (cm.search_contact_by_id(his_id)!=null){ //Si l'id existe déjà
-                            send_REID(rep,his_id+1); //on renvoie refus et on donne l'id conseillé
-                            cm.setIdMax(his_id+1); //et on met à jour l'id_max
+                        if (his_id <= cm.getIdMax()) { //Si l'id existe déjà
+                            send_REID(rep, his_id + 1); //on renvoie refus et on donne l'id conseillé
+                            cm.setIdMax(his_id + 1); //et on met à jour l'id_max
                         } //else on fait rien il ( il supposera que oui tant que personne lui dit non )
                         break;
 
@@ -276,28 +286,34 @@ public class ChatSystem { //instance de chat sur une machine
                         int suggest_id = DatagramManager.XXID_to_id(msg);
                         IDAccepted = false;
                         cm.setIdMax(suggest_id);
+                        break;
 
                     default:
-                        System.out.println("Header inconnu");
+                        System.out.println("Header inconnu : " + msg);
 
                 }
 
             }
+            System.out.println("THREAD LISTENING STOPPED");
         }
     }
 
     public class UpdateContactsThread extends Thread {
         @Override
         public void run() {
-            while(true){
-                for(int p : Main.portList){ // TODO: Changer ce mécanisme déguelasse quand on passera au cas réel sur un intranet
+            while (!this.isInterrupted()) {
+                for (int p : Main.portList) { // TODO: Changer ce mécanisme déguelasse quand on passera au cas réel sur un intranet
+                    if (p == port) continue;
                     send_DECO(p);
                 }
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    this.interrupt();
+                    System.out.println("thread stopped ");
+                    //throw new RuntimeException(e);
                 }
+                //System.out.println("THREAD rly stopped ?");
                 cm.decreaseTTL();
             }
         }

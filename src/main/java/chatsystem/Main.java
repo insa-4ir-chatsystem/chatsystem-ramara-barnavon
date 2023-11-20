@@ -38,32 +38,17 @@ public class Main {
         ChatSystem ChatK = new ChatSystem(ip, portK);
 
         ChatJ.start("juju");
-
-
-
-        ChatJ.startListening();
-        ChatM.startListening();
-        ChatZ.startListening();
-        ChatK.startListening();
+        ChatM.start("matos");
+        //ChatZ.start("zorro");
+        //ChatK.start("matis");
 
         try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        for(Integer I : portList){
-            ChatJ.send_DECO(I);
-            ChatM.send_DECO(I);
-        }
-        try {
-            Thread.sleep(500);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
 
-        ChatJ.afficherListeContacts();
-
-        ChatM.afficherListeContacts();
+        ChatM.closeChat();
 
     }
 }
