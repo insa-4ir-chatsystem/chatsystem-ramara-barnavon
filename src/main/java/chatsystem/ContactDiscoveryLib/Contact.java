@@ -7,6 +7,10 @@ public class Contact {
     private int id;
     private int TTL; // time to live before removing from Contact list
 
+    public Contact() {
+        this.id = -1;
+        this.pseudo = "M.Anonyme (n'a pas encore obtenu de pseudo)";
+    }
     public Contact(String pseudo, int id){
         this.id = id;
         this.pseudo = pseudo;
@@ -20,7 +24,11 @@ public class Contact {
 
     //méthode
     public String getPseudo() {
-        return this.pseudo;
+        if (pseudo != null) {
+            return this.pseudo;
+        } else {
+            return "M.Anonyme (n'a pas encore obtenu de pseudo)";
+        }
     }
     public int getId() {
         return this.id;

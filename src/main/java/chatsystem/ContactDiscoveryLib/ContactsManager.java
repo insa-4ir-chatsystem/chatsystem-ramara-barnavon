@@ -64,15 +64,20 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
             c.decrementTTL();
             if (c.getTTL() <= 0) {
                 iterator.remove();
-                System.out.println("TTl expiré, contact retiré : " + c);
+                System.out.println("TTl expiré, contact retiré : " + c); //TODO: ptete que ce serait sympa de savoir c'est sur la liste de qui qu'il est retiré
+                //System.out.println("M");
             }
         }
     }
 
 
     public synchronized void afficherListe() {
-        for (Contact contact : this.ContactList) {
-            System.out.println("    " + contact);
+        if (!ContactList.isEmpty()) {
+            for (Contact contact : this.ContactList) {
+                System.out.println("    " + contact);
+            }
+        }else {
+            System.out.println(" vide");
         }
     }
 }

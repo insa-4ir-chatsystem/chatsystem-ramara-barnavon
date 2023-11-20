@@ -15,11 +15,11 @@ import java.util.Scanner;
 public class ChatSystem { //instance de chat sur une machine
 
     //Attribut
-    ContactsManager cm;
-    Contact monContact;
-    DatagramSocket socketBroadcast;
-    ListeningThread LT;
-    UpdateContactsThread UCT;
+    private ContactsManager cm;
+    private Contact monContact;
+    private DatagramSocket socketBroadcast;
+    private ListeningThread LT;
+    private UpdateContactsThread UCT;
     private DataOutputStream out;
     private DataInputStream in;
     private InetAddress address;
@@ -31,6 +31,7 @@ public class ChatSystem { //instance de chat sur une machine
 
     //Constructeur
     public ChatSystem(String ip, int port){
+        this.monContact = new Contact();
         this.port = port;
         this.cm = new ContactsManager();
         initSocket(ip, port);
@@ -47,10 +48,26 @@ public class ChatSystem { //instance de chat sur une machine
     }
 
 
+    //OTHER methods
 
+    public void start(String pseudoAsked){
+        System.out.println("Lancement du chatsystem : " + pseudoAsked + "?");
+        startListening();
+        startUpdateContacts();
+        int id = chooseID();
+        this.cm.setIdMax(id);
+        String pseudo = choosePseudo(pseudoAsked);
+        this.monContact = new Contact(pseudo, id);
+        //System.out.println("Creation contact : " + this.monContact);
+        /*
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        */
 
-
-    //OTHER method
+    }
     public void initSocket(String addr, int port){
         try {
             this.socketBroadcast = new DatagramSocket(port);
@@ -79,7 +96,7 @@ public class ChatSystem { //instance de chat sur une machine
             }
         }
         if(IDAccepted){
-            System.out.println("Id accepté : " + id);
+            System.out.println("Id accepté et unique : " + id);
             return id;
         }else { return -1; }
         
@@ -100,21 +117,14 @@ public class ChatSystem { //instance de chat sur une machine
         if(!pseudoAccepted){
             System.out.println("Pseudo " + pseudo + " non disponible, fermeture du chat");
             closeChat(); // Fermeture du chat, solution temporaire
+        } else {
+            System.out.println("Pseudo accepté et unique: " + pseudo);
         }
 
         return pseudo;
     }
 
-    public void start(String pseudoAsked){
-        startListening();
-        startUpdateContacts();
-        int id = chooseID();
-        this.cm.setIdMax(id);
-        String pseudo = choosePseudo(pseudoAsked);
-        this.monContact = new Contact(pseudo, id, -1);
-        //System.out.println("Creation contact : " + this.monContact);
 
-    }
 
 
 
@@ -213,24 +223,28 @@ public class ChatSystem { //instance de chat sur une machine
     }
 
     public void startListening(){
+        System.out.println("Lancement du Thread de listening");
         this.LT = new ListeningThread();
         LT.start();
     }
 
     public void startUpdateContacts(){
+        System.out.println("Lancement du Thread d'update des contacts");
         this.UCT = new UpdateContactsThread();
         UCT.start();
     }
 
     public void afficherListeContacts(){
-        System.out.println("Je suis " + monContact + " et ma liste :");
-        System.out.println("[");
+        System.out.println("Je suis " + monContact.getPseudo() + " et ma liste de contact est :");
+        //System.out.println("[");
         this.cm.afficherListe();
-        System.out.println("]");
+        //System.out.println("]");
     }
 
     public void closeChat(){
+        System.out.println("Tentative d'interruption du thread de listening de " + monContact.getPseudo());
         LT.interrupt();
+        System.out.println("Tentative d'interruption du Thread d'update de " + monContact.getPseudo());
         UCT.interrupt();
 
         //System.exit(1);
@@ -252,13 +266,13 @@ public class ChatSystem { //instance de chat sur une machine
                     case INCO: // On reçoit une info de contact, il faut l'ajouter à notre liste de contacts
 
                         cm.updateContact(DatagramManager.INCO_to_Contact(msg));
-                        afficherListeContacts();
+                        //afficherListeContacts();
                         //System.out.println("Envoie Contact");
 
                         break;
                     case DECO: //On reçoit une demande de contact, on souhaite renvoyer notre contact au destinaire
                         //System.out.println("j'ai reçu DECO");
-                        if (!(monContact == null)) {
+                        if ((monContact != null && (monContact.getId() != -1))) {
                             send_INCO(rep);
                             //System.out.println("je suis " + monContact.getId() + " et j'envoie mon contact");
                         }
@@ -294,7 +308,7 @@ public class ChatSystem { //instance de chat sur une machine
                 }
 
             }
-            System.out.println("THREAD LISTENING STOPPED");
+            System.out.println("[IMPORTANT] Confirmation de l'arrêt du Thread de listening de " + monContact.getPseudo());
         }
     }
 
@@ -310,12 +324,14 @@ public class ChatSystem { //instance de chat sur une machine
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     this.interrupt();
-                    System.out.println("thread stopped ");
+                    //System.out.println("Confirmation de l'arrêt du Thread d'update de " + monContact.getPseudo());
                     //throw new RuntimeException(e);
                 }
                 //System.out.println("THREAD rly stopped ?");
                 cm.decreaseTTL();
+                afficherListeContacts();
             }
+            System.out.println("[IMPORTANT] Confirmation de l'arrêt du Thread d'Update de " + monContact.getPseudo());
         }
     }
 

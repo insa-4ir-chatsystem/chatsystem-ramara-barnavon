@@ -1,15 +1,21 @@
-# ~~Burn~~ Replace with your own after reading
+# Chat System RAMARA-BARNAVON
 
-This private repository is created for you so that your teachers have access to it.
+## Détails sur notre projet
 
-## Identify yourself
+### Nous faisons les tests en localhost ce qui implique : 
+-on définit une liste de port que nos différent chatsystem utiliseront pour communiquer
+-Lors du test, il y a beaucoup de Thread qui print en même temps, à ne pas confondre avec un bug
 
-Before anything, **complete the `metadata.yml` with your own information.** 
+### Autres remarques
+-Les messages échangés entre les chatsystems sont identifiés grâce à un Header de 4 majuscules.
+-Il y a le thread principale, puis 1 Thread qui est en écoute de messages et un dernier qui met à jour la liste des contacts toutes les secondes en demandant au réseau.
+-Comme c'est de l'UDP on a mis un ttl(=time to live) de taille n pour ne pas supprimer un contact si il y a n messages qui ont été perdus(ou non envoyé)
 
-This is the file that we will use to identify the teacher responsible for the repository and assign the grades to the participating students.
 
-## Take ownership
 
+
+
+## TO DO AND DELETE : 
 As long as you make sure to keep the `metadata.yml` file at the root of this repository, you are free to do anything. Our suggestion would be to have it organized into something like the following:
 
     .gitignore
@@ -23,4 +29,3 @@ As long as you make sure to keep the `metadata.yml` file at the root of this rep
       uml/
       report.pdf
 
-In particular, you will soon have to replace this README with something that describes your own project.
