@@ -11,7 +11,22 @@ public class DatagramManager {
 
         return new Contact(pseudo, id);
     }
+    public static int XXID_to_id(String mess) {
+        String[] parties = mess.split(":");
+        int id = Integer.parseInt(parties[1]);
+        return id;
 
+    }
+    public static String XXPS_to_pseudo(String mess) {
+        String[] parties = mess.split(":");
+        String pseudo = parties[1];
+        return pseudo;
+    }
+    /*public static int REID_to_id(String mess) {
+        String[] parties = mess.split(":");
+        int id = Integer.parseInt(parties[1]);
+        return id;
+    }*/
 
 
 

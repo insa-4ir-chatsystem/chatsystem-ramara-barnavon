@@ -10,11 +10,13 @@ public class Main {
     public static ArrayList<Integer> portList;
     public static void main(String[] args) {
 
-        //TODO: Créer un contact à traver une méthode permettant de verif l'unicité
+
+        /*
         Contact leJ = new Contact("jules", 69);
         Contact leM = new Contact("Ping-Win", 420);
         Contact leZ = new Contact("Zemmour", 667);
         Contact leK = new Contact("Kbo", 71);
+        */
 
 
 
@@ -30,10 +32,14 @@ public class Main {
         portList.add(portJ);
         portList.add(portM);
 
-        ChatSystem ChatJ = new ChatSystem(leJ, ip, portJ);
-        ChatSystem ChatM = new ChatSystem(leM,ip, portM);
-        ChatSystem ChatZ = new ChatSystem(leZ, ip, portZ);
-        ChatSystem ChatK = new ChatSystem(leK,ip, portK);
+        ChatSystem ChatJ = new ChatSystem(ip, portJ);
+        ChatSystem ChatM = new ChatSystem(ip, portM);
+        ChatSystem ChatZ = new ChatSystem(ip, portZ);
+        ChatSystem ChatK = new ChatSystem(ip, portK);
+
+        ChatJ.start("juju");
+
+
 
         ChatJ.startListening();
         ChatM.startListening();
@@ -46,8 +52,8 @@ public class Main {
             throw new RuntimeException(e);
         }
         for(Integer I : portList){
-            ChatJ.demande_liste_contact(I);
-            ChatM.demande_liste_contact(I);
+            ChatJ.send_DECO(I);
+            ChatM.send_DECO(I);
         }
         try {
             Thread.sleep(500);

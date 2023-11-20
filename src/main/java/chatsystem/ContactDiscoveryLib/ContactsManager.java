@@ -3,39 +3,51 @@ package chatsystem.ContactDiscoveryLib;
 import java.util.ArrayList;
 
 public class ContactsManager { // verif de la liste de contacts (expirations) toutes les 20s minimum
-    ArrayList<Contact> ContactList;
+    private ArrayList<Contact> ContactList;
+    private int idMax;
 
 
     //contructeur
     public ContactsManager(){
         this.ContactList = new ArrayList<>();
+        this.idMax = 1;
     }
 
+    public void setIdMax(int idMax) {
+        this.idMax = idMax;
+    }
+
+    public int getIdMax() {
+        return idMax;
+    }
 
     //méthodes
+
+
 
     public void updateContact(Contact c) {
         if (ContactList.contains(c)) {
             System.out.println("Déjà présent dans la liste, mise à jour du TTL");
-            Contact contact = search_contact_by_id(c);
+            Contact contact = search_contact_by_id(c.getId());
             contact.setTTL(4);
         } else {
             ContactList.add(c);
+            this.idMax = Math.max(this.idMax, c.getId());
         }
     }
 
-    public Contact search_contact_by_id(Contact contact){
+    public Contact search_contact_by_id(int contact){
         for(Contact c : this.ContactList){
-            if (c.equals(contact)){
+            if (c.getId() == (contact)){
                 return c;
             }
         }
         return null;
     }
 
-    public Contact search_contact_by_name(Contact contact){
+    public Contact search_contact_by_pseudo(String contact){
         for(Contact c : this.ContactList){
-            if (c.samePseudo(contact)){
+            if (c.getPseudo().equals(contact)){
                 return c;
             }
         }
