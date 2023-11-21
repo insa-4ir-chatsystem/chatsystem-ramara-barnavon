@@ -24,11 +24,7 @@ public class Contact {
 
     //méthode
     public String getPseudo() {
-        if (pseudo != null) {
-            return this.pseudo;
-        } else {
-            return "M.Anonyme (n'a pas encore obtenu de pseudo)";
-        }
+        return this.pseudo;
     }
     public int getId() {
         return this.id;

@@ -31,9 +31,10 @@ public class ChatSystem { //instance de chat sur une machine
 
     //Constructeur
     public ChatSystem(String ip, int port){
-        this.monContact = new Contact();
-        this.port = port;
         this.cm = new ContactsManager();
+        this.monContact = new Contact();
+        cm.setMonContact(this.monContact);
+        this.port = port;
         initSocket(ip, port);
     }
     //Methods
@@ -58,6 +59,7 @@ public class ChatSystem { //instance de chat sur une machine
         this.cm.setIdMax(id);
         String pseudo = choosePseudo(pseudoAsked);
         this.monContact = new Contact(pseudo, id);
+        cm.setMonContact(this.monContact);
         //System.out.println("Creation contact : " + this.monContact);
         /*
         try {

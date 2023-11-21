@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 public class ContactsManager { // verif de la liste de contacts (expirations) toutes les 20s minimum
     private ArrayList<Contact> ContactList;
+    private Contact monContact;
     private int idMax;
 
 
@@ -12,6 +13,10 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
     public ContactsManager(){
         this.ContactList = new ArrayList<>();
         this.idMax = 1;
+    }
+
+    public void setMonContact(Contact monContact) {
+        this.monContact = monContact;
     }
 
     public void setIdMax(int idMax) {
@@ -64,7 +69,7 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
             c.decrementTTL();
             if (c.getTTL() <= 0) {
                 iterator.remove();
-                System.out.println("TTl expiré, contact retiré : " + c); //TODO: ptete que ce serait sympa de savoir c'est sur la liste de qui qu'il est retiré
+                System.out.println("{" + monContact.getPseudo() + "}  TTl expiré, contact retiré : " + c); //TODO: ptete que ce serait sympa de savoir c'est sur la liste de qui qu'il est retiré
                 //System.out.println("M");
             }
         }
@@ -74,7 +79,7 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
     public synchronized void afficherListe() {
         if (!ContactList.isEmpty()) {
             for (Contact contact : this.ContactList) {
-                System.out.println("    " + contact);
+                System.out.println("    {" + monContact.getPseudo() + "}    " + contact);
             }
         }else {
             System.out.println(" vide");
