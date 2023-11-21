@@ -14,7 +14,7 @@
 ## Compilation du projet et exécution
 
 ### Compilation
-Pour compiler le projet, il faut se placer dans le dossier `chatsystem-ramara-barnavon` et exécuter la commande `mvn compile package`
+Pour compiler le projet, il faut se placer dans le dossier **chatsystem-ramara-barnavon** et exécuter la commande `mvn compile package`
 
 ### Exécution
 Pour exécuter le projet, lancer `java -jar target/ChatSystem-1.0.jar` toujours dans le même dossier
