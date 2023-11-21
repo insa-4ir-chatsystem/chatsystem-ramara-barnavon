@@ -58,8 +58,10 @@ public class ChatSystem { //instance de chat sur une machine
         int id = chooseID();
         this.cm.setIdMax(id);
         String pseudo = choosePseudo(pseudoAsked);
-        this.monContact = new Contact(pseudo, id);
-        cm.setMonContact(this.monContact);
+        if (pseudoAccepted) {
+            this.monContact = new Contact(pseudo, id);
+            cm.setMonContact(this.monContact);
+        }
         //System.out.println("Creation contact : " + this.monContact);
         /*
         try {

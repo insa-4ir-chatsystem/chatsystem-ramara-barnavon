@@ -32,15 +32,17 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
 
 
     public synchronized void updateContact(Contact c) {
-        if (ContactList.contains(c)) {
-            //System.out.println("Déjà présent dans la liste, mise à jour du TTL");
-            Contact contact = search_contact_by_id(c.getId());
-            contact.setTTL(4);
-        } else {
-            c.setTTL(4);
-            ContactList.add(c);
-            //System.out.println("Add to contact list : " + c);
-            this.idMax = Math.max(this.idMax, c.getId());
+        if (c.getPseudo() != "M.Anonyme (n'a pas encore obtenu de pseudo)") {
+            if (ContactList.contains(c)) {
+                //System.out.println("Déjà présent dans la liste, mise à jour du TTL");
+                Contact contact = search_contact_by_id(c.getId());
+                contact.setTTL(4);
+            } else {
+                c.setTTL(4);
+                ContactList.add(c);
+                //System.out.println("Add to contact list : " + c);
+                this.idMax = Math.max(this.idMax, c.getId());
+            }
         }
     }
 
