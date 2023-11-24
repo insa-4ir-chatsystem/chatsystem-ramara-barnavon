@@ -31,7 +31,7 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
 
 
 
-    public synchronized void updateContact(Contact c) {
+    public synchronized void updateContact(Contact c) { //TODO:Set un "define java" pour le pseudo d'un mec sans contact
         if (c.getPseudo() != "M.Anonyme (n'a pas encore obtenu de pseudo)") {
             if (ContactList.contains(c)) {
                 //System.out.println("Déjà présent dans la liste, mise à jour du TTL");
@@ -71,7 +71,7 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
             c.decrementTTL();
             if (c.getTTL() <= 0) {
                 iterator.remove();
-                System.out.println("{" + monContact.getPseudo() + "}  TTl expiré, contact retiré : " + c); //TODO: ptete que ce serait sympa de savoir c'est sur la liste de qui qu'il est retiré
+                System.out.println("{" + c.getPseudo() + "}  TTl expiré, contact retiré : " + c); //TODO: ptete que ce serait sympa de savoir c'est sur la liste de qui qu'il est retiré
                 //System.out.println("M");
             }
         }
