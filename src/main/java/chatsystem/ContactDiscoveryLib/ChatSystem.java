@@ -26,8 +26,7 @@ public class ChatSystem { //instance de chat sur une machine
     private int port;
     private boolean pseudoAccepted;
     private boolean IDAccepted;
-    public void initSocket_Broadcast() {
-    }
+
 
     //Constructeur
     public ChatSystem(String ip, int port){
@@ -48,6 +47,13 @@ public class ChatSystem { //instance de chat sur une machine
         this.monContact.setId(id);
     }
 
+    public int getPort() {
+        return port;
+    }
+
+    public ContactsManager getCm() {
+        return cm;
+    }
 
     //OTHER methods
 
@@ -60,6 +66,8 @@ public class ChatSystem { //instance de chat sur une machine
         String pseudo = choosePseudo(pseudoAsked);
         if (pseudoAccepted) {
             this.monContact = new Contact(pseudo, id);
+            LT.setName("LT Thread - " + this.monContact.getPseudo());
+            UCT.setName("UCT Thread - " + this.monContact.getPseudo());
             cm.setMonContact(this.monContact);
         }
         //System.out.println("Creation contact : " + this.monContact);
@@ -221,7 +229,7 @@ public class ChatSystem { //instance de chat sur une machine
             socketBroadcast.receive(packet);
             //System.out.println("j'ai receive un paquet");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Socket fermé pendant une opération de listen (pas grave)");
         }
         return packet;
     }
@@ -230,12 +238,14 @@ public class ChatSystem { //instance de chat sur une machine
         System.out.println("Lancement du Thread de listening");
         this.LT = new ListeningThread();
         LT.start();
+        LT.setName("LT Thread - " + this.monContact.getPseudo());
     }
 
     public void startUpdateContacts(){
         System.out.println("Lancement du Thread d'update des contacts");
         this.UCT = new UpdateContactsThread();
         UCT.start();
+        UCT.setName("UCT Thread - " + this.monContact.getPseudo());
     }
 
     public void afficherListeContacts(){
@@ -250,6 +260,12 @@ public class ChatSystem { //instance de chat sur une machine
         LT.interrupt();
         System.out.println("Tentative d'interruption du Thread d'update de " + monContact.getPseudo());
         UCT.interrupt();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        this.socketBroadcast.close();
 
         //System.exit(1);
     }

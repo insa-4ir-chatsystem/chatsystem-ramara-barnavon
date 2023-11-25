@@ -27,12 +27,16 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
         return idMax;
     }
 
+    public ArrayList<Contact> getContactList() {
+        return ContactList;
+    }
+
     //méthodes
 
 
 
     public synchronized void updateContact(Contact c) { //TODO:Set un "define java" pour le pseudo d'un mec sans contact
-        if (c.getPseudo() != "M.Anonyme (n'a pas encore obtenu de pseudo)") {
+        if (c.getPseudo() != Contact.NO_PSEUDO) {
             if (ContactList.contains(c)) {
                 //System.out.println("Déjà présent dans la liste, mise à jour du TTL");
                 Contact contact = search_contact_by_id(c.getId());

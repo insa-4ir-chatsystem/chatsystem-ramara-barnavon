@@ -6,10 +6,11 @@ public class Contact {
     private String pseudo;
     private int id;
     private int TTL; // time to live before removing from Contact list
+    public static final String NO_PSEUDO = "M.Anonyme (n'a pas encore obtenu de pseudo)";
 
     public Contact() {
         this.id = -1;
-        this.pseudo = "M.Anonyme (n'a pas encore obtenu de pseudo)";
+        this.pseudo = NO_PSEUDO;
     }
     public Contact(String pseudo, int id){
         this.id = id;
