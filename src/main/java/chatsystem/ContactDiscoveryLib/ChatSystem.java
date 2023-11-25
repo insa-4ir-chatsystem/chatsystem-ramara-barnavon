@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.net.*;
 import java.util.Scanner;
 
+import static java.lang.System.exit;
+
 //Nos Headers sont sur 4 caracs
 //NB on aurait pu optimiser et ne pas utiliser de ID vu que le pseudo est unique ( du coup dans notre cas on utilise les deux pour l'instant )
 
@@ -224,12 +226,16 @@ public class ChatSystem { //instance de chat sur une machine
 
     public DatagramPacket listen(){
         byte[] buf = new byte[256];
+
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
+        //System.out.println(new String(packet.getData(), 0, packet.getLength()));
         try {
             socketBroadcast.receive(packet);
             //System.out.println("j'ai receive un paquet");
         } catch (IOException e) {
+
             System.out.println("Socket fermé pendant une opération de listen (pas grave)");
+            return null; //Bug étrange lorsqu'il y a l'exception au mauvais moment le packet se corromp
         }
         return packet;
     }
@@ -266,6 +272,7 @@ public class ChatSystem { //instance de chat sur une machine
             throw new RuntimeException(e);
         }
         this.socketBroadcast.close();
+        //System.out.println("le socket a été fermé");
 
         //System.exit(1);
     }
@@ -281,52 +288,56 @@ public class ChatSystem { //instance de chat sur une machine
                 //System.out.println("debut while");
                 rep = listen(); //réécrire la rep et la renvoyer
                 //System.out.println("pdu reçu");
-                String msg = new String(rep.getData(), 0, rep.getLength());
-                switch (DatagramManager.getHeader(msg)) {
-                    case INCO: // On reçoit une info de contact, il faut l'ajouter à notre liste de contacts
+                if (rep != null) {
+                    String msg = new String(rep.getData(), 0, rep.getLength());
 
-                        cm.updateContact(DatagramManager.INCO_to_Contact(msg));
-                        //afficherListeContacts();
-                        //System.out.println("Envoie Contact");
+                    switch (DatagramManager.getHeader(msg)) {
+                        case INCO: // On reçoit une info de contact, il faut l'ajouter à notre liste de contacts
 
-                        break;
-                    case DECO: //On reçoit une demande de contact, on souhaite renvoyer notre contact au destinaire
-                        //System.out.println("j'ai reçu DECO");
-                        if ((monContact != null && (monContact.getId() != -1))) {
-                            send_INCO(rep);
-                            //System.out.println("je suis " + monContact.getId() + " et j'envoie mon contact");
-                        }
-                        //System.out.println("j'ai envoyé INCO");
-                        break;
-                    case REPS: // Si le pseudo demandé est refusé par un contact
-                        pseudoAccepted = false;
-                        break;
-                    case DEPS: //
-                        String his_pseudo = DatagramManager.XXPS_to_pseudo(msg);
-                        if (cm.search_contact_by_pseudo(his_pseudo) != null || (monContact != null && his_pseudo == monContact.getPseudo())) { //Si le pseudo existe déjà
-                            send_REPS(rep);
-                        } //else on fait rien il ( il supposera que oui tant que personne lui dit non )
+                            cm.updateContact(DatagramManager.INCO_to_Contact(msg));
+                            //afficherListeContacts();
+                            //System.out.println("Envoie Contact");
 
-                        break;
-                    case DEID: //si l'ID existe il refuse avec un id_conseiller ( le max + 1 de sa liste ) si l'ID n'existe pas, il renvoie rien
-                        int his_id = DatagramManager.XXID_to_id(msg);
-                        if (his_id <= cm.getIdMax()) { //Si l'id existe déjà
-                            send_REID(rep, his_id + 1); //on renvoie refus et on donne l'id conseillé
-                            cm.setIdMax(his_id + 1); //et on met à jour l'id_max
-                        } //else on fait rien il ( il supposera que oui tant que personne lui dit non )
-                        break;
+                            break;
+                        case DECO: //On reçoit une demande de contact, on souhaite renvoyer notre contact au destinaire
+                            //System.out.println("j'ai reçu DECO");
+                            if ((monContact != null && (monContact.getId() != -1))) {
+                                send_INCO(rep);
+                                //System.out.println("je suis " + monContact.getId() + " et j'envoie mon contact");
+                            }
+                            //System.out.println("j'ai envoyé INCO");
+                            break;
+                        case REPS: // Si le pseudo demandé est refusé par un contact
+                            pseudoAccepted = false;
+                            break;
+                        case DEPS: //
+                            String his_pseudo = DatagramManager.XXPS_to_pseudo(msg);
+                            if (cm.search_contact_by_pseudo(his_pseudo) != null || (monContact != null && his_pseudo == monContact.getPseudo())) { //Si le pseudo existe déjà
+                                send_REPS(rep);
+                            } //else on fait rien il ( il supposera que oui tant que personne lui dit non )
 
-                    case REID: //Si on reçoit un refus alors notre ID n'est pas accepté et c'est la fonction start() qui relancera une requete si besoin
-                        int suggest_id = DatagramManager.XXID_to_id(msg);
-                        IDAccepted = false;
-                        cm.setIdMax(suggest_id);
-                        break;
+                            break;
+                        case DEID: //si l'ID existe il refuse avec un id_conseiller ( le max + 1 de sa liste ) si l'ID n'existe pas, il renvoie rien
+                            int his_id = DatagramManager.XXID_to_id(msg);
+                            if (his_id <= cm.getIdMax()) { //Si l'id existe déjà
+                                send_REID(rep, his_id + 1); //on renvoie refus et on donne l'id conseillé
+                                cm.setIdMax(his_id + 1); //et on met à jour l'id_max
+                            } //else on fait rien il ( il supposera que oui tant que personne lui dit non )
+                            break;
 
-                    default:
-                        System.out.println("Header inconnu : " + msg);
+                        case REID: //Si on reçoit un refus alors notre ID n'est pas accepté et c'est la fonction start() qui relancera une requete si besoin
+                            int suggest_id = DatagramManager.XXID_to_id(msg);
+                            IDAccepted = false;
+                            cm.setIdMax(suggest_id);
+                            break;
+                        case NULL:
+                            break; //On skip le paquet
+                        default:
+                            System.out.println("Header inconnu : " + msg);
+
+                    }
 
                 }
-
             }
             System.out.println("[IMPORTANT] Confirmation de l'arrêt du Thread de listening de " + monContact.getPseudo());
         }

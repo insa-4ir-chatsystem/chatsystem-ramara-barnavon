@@ -6,7 +6,8 @@ public enum HeaderDatagram {
     DEPS,  //demande pseudo
     REPS, //refus pseudo
     DEID, //demande id
-    REID  //refus id
+    REID,  //refus id
+    NULL //Paquet mort ou insignifiant
     ;
 
 }

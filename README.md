@@ -11,6 +11,7 @@
 -Il y a le thread principale, puis 1 Thread qui est en écoute de messages et un dernier qui met à jour la liste des contacts toutes les secondes en demandant au réseau.<br>
 -Comme c'est de l'UDP on a mis un ttl(=time to live) de taille n pour ne pas supprimer un contact si il y a n messages qui ont été perdus(ou non envoyé).<br>
 
+## Les tests de ChatSystemTest ne peuvent pas encore s'enchaîner ( mauvais reset ) il faut les faire 1 par 1. 
 ## Compilation du projet et exécution
 
 ### Compilation

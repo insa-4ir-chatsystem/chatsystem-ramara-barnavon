@@ -31,15 +31,19 @@ public class DatagramManager {
 
 
     public static HeaderDatagram getHeader(String mess){
-        HeaderDatagram header = null;
-        try {
-            String[] parties = mess.split(":");
-            header = HeaderDatagram.valueOf(parties[0]);
-        }catch (IllegalArgumentException e) {
-            System.out.println("Invalid header of message : " + mess);
+        if (mess != null) {
+            HeaderDatagram header = null;
+            try {
+                String[] parties = mess.split(":");
+                header = HeaderDatagram.valueOf(parties[0]);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid header of message : " + mess);
 
+            }
+            return header;
+        } else {
+            return HeaderDatagram.NULL;
         }
-        return header;
     }
 
 }
