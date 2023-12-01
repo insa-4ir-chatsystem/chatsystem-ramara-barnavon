@@ -62,7 +62,7 @@ comments: rien à redire chef
 <!-- Structure of the code into sensible and independent packages -->
 grade: A
 
-comments: Plusieurs classes et un package. Un dossier pour les tests.
+comments: Plusieurs classes et un package. Un dossier pour les tests. Certaines noms de classes sont pas super (exemple : chatsysteme pour le reseau)
 
 
 ## reliability
