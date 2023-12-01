@@ -69,7 +69,7 @@ comments: Plusieurs classes et un package. Un dossier pour les tests. Certaines 
 <!-- Thread safety and error handling -->
 grade: A
 
-comments: Il y a des thread safety. IL y a des try catch. 
+comments: Il y a des thread safety. IL y a des try catch. Cependant ceraines exception sont pas nécessaires car le prpgramme s'arrête au lieu de faire remonter l'erreur.
 
 
 ## style
