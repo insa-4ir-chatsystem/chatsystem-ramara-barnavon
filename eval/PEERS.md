@@ -13,6 +13,7 @@ Evaluators:
 ## discovery
 <!-- Connection and contact discovery phase -->
 grade: B
+
 comments: 
 Piste d'amélioration : Pas possible de rentrer son propre nom d'utilisateur. On est en localhost. Il faudrait utiliser l'envoie des requetes UDP en broadcast sur un seul port. L'affichage peut être un peu amélioré (sans les {} pour plus de lisibilté). 
 Point positif : time to live. 
