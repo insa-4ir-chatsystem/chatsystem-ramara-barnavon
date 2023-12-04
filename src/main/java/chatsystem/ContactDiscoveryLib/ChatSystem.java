@@ -1,14 +1,17 @@
 package chatsystem.ContactDiscoveryLib;
 
 import chatsystem.Main;
+import chatsystem.network.UDP_Client;
+import chatsystem.network.UDP_Message;
+import chatsystem.network.UDP_Server;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.*;
-import java.util.Scanner;
-
-import static java.lang.System.exit;
 
 //Nos Headers sont sur 4 caracs
 //NB on aurait pu optimiser et ne pas utiliser de ID vu que le pseudo est unique ( du coup dans notre cas on utilise les deux pour l'instant )
@@ -20,7 +23,6 @@ public class ChatSystem { //instance de chat sur une machine
     private ContactsManager cm;
     private Contact monContact;
     private DatagramSocket socketBroadcast;
-    private ListeningThread LT;
     private UpdateContactsThread UCT;
     private DataOutputStream out;
     private DataInputStream in;
@@ -28,6 +30,9 @@ public class ChatSystem { //instance de chat sur une machine
     private int port;
     private boolean pseudoAccepted;
     private boolean IDAccepted;
+    private UDP_Server udpServer;
+
+    private static final Logger LOGGER = LogManager.getLogger(ChatSystem.class);
 
 
     //Constructeur
@@ -36,17 +41,18 @@ public class ChatSystem { //instance de chat sur une machine
         this.monContact = new Contact();
         cm.setMonContact(this.monContact);
         this.port = port;
-        initSocket(ip, port);
-    }
-    //Methods
 
-    //Getter and setter
+        try {
+            initServer(ip, port);
+        } catch (Exception e) { // impossible to recover from this exception
+            LOGGER.error("Unable to create UDP_Server with ip: " + ip + " and port: " + port);
+            System.exit(1);
+        }
+    }
+
+    /** Getters and setters */
     public Contact getMonContact() {
         return monContact;
-    }
-    public void setMonContact(String pseudo, int id) {
-        this.monContact.setPseudo(pseudo);
-        this.monContact.setId(id);
     }
 
     public int getPort() {
@@ -57,11 +63,23 @@ public class ChatSystem { //instance de chat sur une machine
         return cm;
     }
 
-    //OTHER methods
+
+    public void setMonContact(String pseudo, int id) {
+        this.monContact.setPseudo(pseudo);
+        this.monContact.setId(id);
+    }
+
+    /** Other Methods */
 
     public void start(String pseudoAsked){
-        System.out.println("Lancement du chatsystem : " + pseudoAsked + "?");
+        LOGGER.info("Lancement du chatsystem : " + pseudoAsked);
         startListening();
+        udpServer.addObserver(new UDP_Server.Observer() {
+            @Override
+            public void handle(UDP_Message received) {
+                System.out.println("Received from udp_server: " + received);
+            }
+        });
         startUpdateContacts();
         int id = chooseID();
         this.cm.setIdMax(id);
@@ -82,13 +100,8 @@ public class ChatSystem { //instance de chat sur une machine
         */
 
     }
-    public void initSocket(String addr, int port){
-        try {
-            this.socketBroadcast = new DatagramSocket(port);
-            this.address = InetAddress.getByName(addr);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public void initServer(String addr, int port) throws SocketException, UnknownHostException {
+        this.udpServer = new UDP_Server(port, addr);
     }
     private int chooseID(){
         IDAccepted = false;
@@ -224,27 +237,11 @@ public class ChatSystem { //instance de chat sur une machine
         }
     }
 
-    public DatagramPacket listen(){
-        byte[] buf = new byte[256];
 
-        DatagramPacket packet = new DatagramPacket(buf, buf.length);
-        //System.out.println(new String(packet.getData(), 0, packet.getLength()));
-        try {
-            socketBroadcast.receive(packet);
-            //System.out.println("j'ai receive un paquet");
-        } catch (IOException e) {
-
-            System.out.println("Socket fermé pendant une opération de listen (pas grave)");
-            return null; //Bug étrange lorsqu'il y a l'exception au mauvais moment le packet se corromp
-        }
-        return packet;
-    }
 
     public void startListening(){
-        System.out.println("Lancement du Thread de listening");
-        this.LT = new ListeningThread();
-        LT.start();
-        LT.setName("LT Thread - " + this.monContact.getPseudo());
+        LOGGER.info("Lancement du Serveur UDP");
+        udpServer.start();
     }
 
     public void startUpdateContacts(){
@@ -278,6 +275,7 @@ public class ChatSystem { //instance de chat sur une machine
     }
 
 
+    /*
     public class ListeningThread extends Thread {
         HeaderDatagram header ;
         @Override
@@ -342,6 +340,7 @@ public class ChatSystem { //instance de chat sur une machine
             System.out.println("[IMPORTANT] Confirmation de l'arrêt du Thread de listening de " + monContact.getPseudo());
         }
     }
+    */
 
     public class UpdateContactsThread extends Thread {
         @Override
