@@ -2,6 +2,7 @@ package chatsystem.ContactDiscoveryLib;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import chatsystem.ChatSystem;
 import chatsystem.Main;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;

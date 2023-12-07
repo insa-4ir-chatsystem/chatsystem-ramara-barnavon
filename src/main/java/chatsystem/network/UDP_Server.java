@@ -44,6 +44,10 @@ public class UDP_Server extends Thread {
         return packet;
     }
 
+    public void close(){
+        socket.close();
+    }
+
 
 
     @Override

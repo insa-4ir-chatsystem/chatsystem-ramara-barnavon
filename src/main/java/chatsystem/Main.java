@@ -1,9 +1,5 @@
 package chatsystem;
 
-import chatsystem.ContactDiscoveryLib.ChatSystem;
-import chatsystem.ContactDiscoveryLib.Contact;
-
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 public class Main {
