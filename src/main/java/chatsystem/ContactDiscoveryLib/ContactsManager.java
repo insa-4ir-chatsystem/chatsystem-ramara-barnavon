@@ -1,20 +1,27 @@
 package chatsystem.ContactDiscoveryLib;
 
+import chatsystem.ChatSystem;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.Iterator;
-
+/** This class is used to handle the local list of contact in the network */
 public class ContactsManager { // verif de la liste de contacts (expirations) toutes les 20s minimum
-    private ArrayList<Contact> ContactList;
+    private ArrayList<Contact> contactList;
     private Contact monContact;
     private int idMax;
+    private static final Logger LOGGER = LogManager.getLogger(ContactsManager.class);
 
 
-    //contructeur
+    /** Constructor */
     public ContactsManager(){
-        this.ContactList = new ArrayList<>();
+        this.contactList = new ArrayList<>();
         this.idMax = 1;
     }
 
+
+    /** Getter/Setter */
     public void setMonContact(Contact monContact) {
         this.monContact = monContact;
     }
@@ -28,30 +35,29 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
     }
 
     public ArrayList<Contact> getContactList() {
-        return ContactList;
+        return contactList;
     }
 
-    //méthodes
+    /** Methods */
 
 
-
-    public synchronized void updateContact(Contact c) { //TODO:Set un "define java" pour le pseudo d'un mec sans contact
+    public synchronized void updateContact(Contact c) {
         if (c.getPseudo() != Contact.NO_PSEUDO) {
-            if (ContactList.contains(c)) {
+            if (contactList.contains(c)) {
                 //System.out.println("Déjà présent dans la liste, mise à jour du TTL");
-                Contact contact = search_contact_by_id(c.getId());
+                Contact contact = searchContactById(c.getId());
                 contact.setTTL(4);
             } else {
                 c.setTTL(4);
-                ContactList.add(c);
+                contactList.add(c);
                 //System.out.println("Add to contact list : " + c);
                 this.idMax = Math.max(this.idMax, c.getId());
             }
         }
     }
 
-    public synchronized Contact search_contact_by_id(int contact){
-        for(Contact c : this.ContactList){
+    public synchronized Contact searchContactById(int contact){
+        for(Contact c : this.contactList){
             if (c.getId() == (contact)){
                 return c;
             }
@@ -59,8 +65,8 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
         return null;
     }
 
-    public synchronized Contact search_contact_by_pseudo(String contact){
-        for(Contact c : this.ContactList){
+    public synchronized Contact searchContactByPseudo(String contact){
+        for(Contact c : this.contactList){
             if (c.getPseudo().equals(contact)){
                 return c;
             }
@@ -69,13 +75,13 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
     }
 
     public synchronized void decreaseTTL() {
-        Iterator<Contact> iterator = this.ContactList.iterator();
+        Iterator<Contact> iterator = this.contactList.iterator();
         while (iterator.hasNext()) {
             Contact c = iterator.next();
             c.decrementTTL();
             if (c.getTTL() <= 0) {
                 iterator.remove();
-                System.out.println("{" + c.getPseudo() + "}  TTl expiré, contact retiré : " + c); //TODO: ptete que ce serait sympa de savoir c'est sur la liste de qui qu'il est retiré
+                LOGGER.info("{" + c.getPseudo() + "}  TTl expiré, contact retiré : " + c); //TODO: ptete que ce serait sympa de savoir c'est sur la liste de qui qu'il est retiré
                 //System.out.println("M");
             }
         }
@@ -83,12 +89,12 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
 
 
     public synchronized void afficherListe() {
-        if (!ContactList.isEmpty()) {
-            for (Contact contact : this.ContactList) {
-                System.out.println("    {" + monContact.getPseudo() + "}    " + contact);
+        if (!contactList.isEmpty()) {
+            for (Contact contact : this.contactList) {
+                LOGGER.info("    {" + monContact.getPseudo() + "}    " + contact);
             }
         }else {
-            System.out.println(" vide");
+            LOGGER.info("Liste de contacts de " + monContact + " est vide");
         }
     }
 }

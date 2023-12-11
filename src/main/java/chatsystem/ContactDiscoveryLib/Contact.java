@@ -1,13 +1,15 @@
 package chatsystem.ContactDiscoveryLib;
 
 import java.util.Objects;
-
+/** this class contain the identity of a User in the network */
 public class Contact {
     private String pseudo;
     private int id;
-    private int TTL; // time to live before removing from Contact list
+    /** time to live before removing from Contact list */
+    private int TTL;
     public static final String NO_PSEUDO = "M.Anonyme (n'a pas encore obtenu de pseudo)";
 
+    /** Constructor */
     public Contact() {
         this.id = -1;
         this.pseudo = NO_PSEUDO;
@@ -23,7 +25,8 @@ public class Contact {
         this.TTL = TTL;
     }
 
-    //méthode
+    /** Getters and setters */
+
     public String getPseudo() {
         return this.pseudo;
     }
@@ -48,6 +51,8 @@ public class Contact {
         this.id = id;
     }
 
+
+    /** Methods */
     public void decrementTTL(){
         this.TTL--;
     }

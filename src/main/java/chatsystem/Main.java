@@ -1,12 +1,20 @@
 package chatsystem;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
+
+import java.lang.module.Configuration;
 import java.util.ArrayList;
 
 public class Main {
 
     public static ArrayList<Integer> portList;
+    private static final Logger LOGGER = LogManager.getLogger(Main.class);
     public static void main(String[] args) {
 
+        Configurator.setRootLevel(Level.TRACE);
         //Liste des ports qu'on prévoit en avance d'utiliser
         String ip = "localhost";
         int portJ = 2023;
@@ -30,30 +38,25 @@ public class Main {
         ChatSystem ChatK = new ChatSystem(ip, portK);
         ChatSystem ChatDouble = new ChatSystem(ip, portDouble);
 
-        System.out.println("Début de la démonstration");
-        System.out.println("Lancement des chatsystems");
-
+        LOGGER.info("Début de la démonstration");
 
         ChatJ.start("juju");
         ChatM.start("matis");
-        ChatZ.start("zorro");
+        //ChatZ.start("zorro");
         //ChatK.start("matos");
 
         try {
-            Thread.sleep(2000);
+            Thread.sleep(000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("[TEST] Vérification de la mise à jour de la liste lors d'une deconnexion ");
+        LOGGER.info("[TEST] Vérification de la mise à jour de la liste lors d'une deconnexion ");
         //TODO:Ne montrer que les paroles de zorro pour mieux comprendre ptete? ( inutile si on implémente IPs dans le futur )
+        //ChatM.closeChat();
+        LOGGER.info("[TEST] Vérification de l'unicité du pseudo");
+        //ChatDouble.start("juju");
+        ChatJ.closeChat();
         ChatM.closeChat();
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        System.out.println("[TEST] Vérification de l'unicité du pseudo");
-        ChatDouble.start("juju");
 
     }
 }

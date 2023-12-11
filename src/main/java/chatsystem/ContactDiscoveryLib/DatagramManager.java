@@ -1,9 +1,11 @@
 package chatsystem.ContactDiscoveryLib;
 
+
+/** This class handle different message received */
 public class DatagramManager {
 
-
-    public static Contact INCO_to_Contact(String mess){
+    /** INCO is the header to be handled here */
+    public static Contact INCOToContact(String mess){
 
         String[] parties = mess.split(":");
         String pseudo = parties[1];
@@ -11,13 +13,15 @@ public class DatagramManager {
 
         return new Contact(pseudo, id);
     }
-    public static int XXID_to_id(String mess) {
+
+    /** DEID and REID are the header to be handled here */
+    public static int XXIDToId(String mess) {
         String[] parties = mess.split(":");
         int id = Integer.parseInt(parties[1]);
         return id;
 
     }
-    public static String XXPS_to_pseudo(String mess) {
+    public static String XXPSToPseudo(String mess) {
         String[] parties = mess.split(":");
         String pseudo = parties[1];
         return pseudo;

@@ -29,21 +29,21 @@ public class ContactsManagerTest {
         testContact.setTTL(3);
         contactsManager.updateContact(testContact);
         contactsManager.updateContact(testContact2);
-        assertEquals(4, contactsManager.search_contact_by_id(testContact.getId()).getTTL());
-        assertEquals(4, contactsManager.search_contact_by_id(testContact2.getId()).getTTL());
+        assertEquals(4, contactsManager.searchContactById(testContact.getId()).getTTL());
+        assertEquals(4, contactsManager.searchContactById(testContact2.getId()).getTTL());
     }
 
     @Test
     public void testSearchContactById() {
         // Test de recherche d'un contact
         contactsManager.updateContact(testContact);
-        assertEquals(testContact, contactsManager.search_contact_by_id(testContact.getId()));
+        assertEquals(testContact, contactsManager.searchContactById(testContact.getId()));
     }
 
     @Test
     public void testSearchContactByPseudo() {
         contactsManager.updateContact(testContact);
-        assertEquals(testContact, contactsManager.search_contact_by_pseudo("Test"));
+        assertEquals(testContact, contactsManager.searchContactByPseudo("Test"));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class ContactsManagerTest {
         testContact.setTTL(0);
         testContact2.setTTL(3);
         contactsManager.decreaseTTL();
-        assertTrue(contactsManager.search_contact_by_id(testContact.getId()) == null); // testContact should be removed from list
+        assertTrue(contactsManager.searchContactById(testContact.getId()) == null); // testContact should be removed from list
         assertEquals(2,testContact2.getTTL()); //TTL should be decreased
     }
 

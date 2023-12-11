@@ -1,5 +1,6 @@
 package chatsystem.ContactDiscoveryLib;
 
+/** Enum class that contains every header type */
 public enum HeaderDatagram {
     INCO, //info contact
     DECO, //demande contact
