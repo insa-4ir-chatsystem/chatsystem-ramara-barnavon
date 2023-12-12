@@ -13,7 +13,7 @@ public class Main {
     public static ArrayList<Integer> portList;
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
     public static void main(String[] args) {
-
+        //TODO: push les diagrammes uml sur le depot
         Configurator.setRootLevel(Level.TRACE);
         //Liste des ports qu'on prévoit en avance d'utiliser
         String ip = "localhost";

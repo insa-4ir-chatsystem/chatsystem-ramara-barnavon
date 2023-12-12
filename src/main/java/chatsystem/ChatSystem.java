@@ -142,12 +142,19 @@ public class ChatSystem { //instance de chat sur une machine
 
         startUpdateContacts();
         int id = chooseID();
-        this.cm.setIdMax(id);
+        this.cm.setIdMax(id);//probleme avec idMax, ça lui répond 3 alors que son camarade à 4
+        while(id == -1){
+            ;
+        }
         String pseudo = choosePseudo(pseudoAsked);
         if (pseudoAccepted) {
             this.monContact = new Contact(pseudo, id);
             UCT.setName("UCT Thread - " + this.monContact.getPseudo());
             cm.setMonContact(this.monContact);
+            LOGGER.debug("Chatsystem " + monContact.getPseudo() + " started correctly");
+        }else{
+            closeChat();
+            LOGGER.debug("Chatsystem not started");
         }
         //System.out.println("Creation contact : " + this.monContact);
         /*
@@ -167,27 +174,29 @@ public class ChatSystem { //instance de chat sur une machine
         IDAccepted = false;
         int ite = 0;
         int id = -1;
-        while (!IDAccepted && ite < 10) {
+        while (!IDAccepted && ite < 20) {
             ite++;
-            id = cm.getIdMax() + 1;
+            IDAccepted = true;//Celui qui lui dit refus va être quelqu'un qui est plus haut donc il est censé lui renvoyer un idmax encore + haut
+            if(ite == 20) IDAccepted = false;
+            id = cm.getIdMax();
             cm.setIdMax(id);
-            IDAccepted = true;
             for (int p : Main.portList) { // TODO: Changer ce mécanisme dégueulasse quand on passera au cas réel sur des IPs
                 if (p == this.port) continue;
                 try { // TODO: good idea try catch here ?
                     UDP_Client.send_DEID(broadcastAddress, p, id);
+                    LOGGER.info("Je suis "+ Thread.currentThread().getName() + " et je demande mon id = " + id);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
             try {
-                Thread.sleep(1000);
+                Thread.sleep(2500);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
         if(IDAccepted){
-            LOGGER.info("Id accepté et unique : " + id);
+            LOGGER.info("Id accepté et unique : " + id + " =================================");
             return id;
         }else { return -1; }
         
@@ -205,16 +214,40 @@ public class ChatSystem { //instance de chat sur une machine
                 throw new RuntimeException(e);
             }
         }
+        try { // wait for others to respond
+            Thread.sleep(2500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        if(!pseudoAccepted){
+            LOGGER.error("Pseudo " + pseudo + " non disponible, fermeture du chat ----------------------- ");
+            closeChat(); // Fermeture du chat, solution temporaire
+        } else {
+            LOGGER.info("Pseudo accepté et unique: " + pseudo +"------------------------------------------");
+        }
+
+        return pseudo;
+    }
+    private String changePseudo(String pseudo){
+        pseudoAccepted = true;
+        for(int p : Main.portList){
+            if(p == this.port) continue;
+            try {
+                UDP_Client.send_DEPS(broadcastAddress, p, pseudo);
+            }catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         if(!pseudoAccepted){
-            LOGGER.error("Pseudo " + pseudo + " non disponible, fermeture du chat");
+            LOGGER.error("Pseudo " + pseudo + " non disponible, fermeture du chat ----------------------- ");
             closeChat(); // Fermeture du chat, solution temporaire
         } else {
-            LOGGER.info("Pseudo accepté et unique: " + pseudo);
+            LOGGER.info("Pseudo accepté et unique: " + pseudo +"------------------------------------------");
         }
 
         return pseudo;
@@ -233,6 +266,10 @@ public class ChatSystem { //instance de chat sur une machine
         udpServer.start();
     }
 
+    public void stopServer(){
+        udpServer.close();
+    }
+
     public void startUpdateContacts(){
         LOGGER.trace("Lancement du Thread d'update des contacts");
         this.UCT = new UpdateContactsThread();
@@ -249,14 +286,15 @@ public class ChatSystem { //instance de chat sur une machine
 
     public void closeChat(){
         LOGGER.trace("Tentative d'interruption du thread de listening de " + monContact.getPseudo());
-        udpServer.close();
-        LOGGER.trace("Tentative d'interruption du Thread d'update de " + monContact.getPseudo());
-        UCT.interrupt();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        stopServer();
+        if (UCT != null){
+            LOGGER.trace("Tentative d'interruption du Thread d'update de " + monContact.getPseudo());
+            UCT.interrupt();
         }
+    }
+
+    public boolean isOpen(){
+        return udpServer.isAlive();
     }
 
 
@@ -281,7 +319,7 @@ public class ChatSystem { //instance de chat sur une machine
                 }
                 //System.out.println("THREAD rly stopped ?");
                 cm.decreaseTTL();
-                afficherListeContacts();
+                //afficherListeContacts();
             }
             LOGGER.trace("[IMPORTANT] Confirmation de l'arrêt du Thread d'Update de " + monContact.getPseudo());
         }

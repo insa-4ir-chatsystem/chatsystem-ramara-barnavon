@@ -9,7 +9,7 @@ public class Contact {
     private int TTL;
     public static final String NO_PSEUDO = "M.Anonyme (n'a pas encore obtenu de pseudo)";
 
-    /** Constructor */
+    /** Constructors */
     public Contact() {
         this.id = -1;
         this.pseudo = NO_PSEUDO;

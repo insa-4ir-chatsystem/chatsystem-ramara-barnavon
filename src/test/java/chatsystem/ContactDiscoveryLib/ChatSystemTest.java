@@ -36,6 +36,7 @@ public class ChatSystemTest {
     public void reset(){ //TODO:Mieux reset pour que les tests puissent s'enchainer
         chatSystem1.closeChat();
         chatSystem2.closeChat();
+        chatSystem3.closeChat();
 
         System.out.println("reset");
     }
@@ -44,14 +45,18 @@ public class ChatSystemTest {
     public void testChooseID() {
         chatSystem1.start("chat1");
         chatSystem2.start("chat2");
+        chatSystem3.start("chat3");
 
         assertNotEquals(chatSystem1.getMonContact().getId(), chatSystem2.getMonContact().getId());
+        assertNotEquals(chatSystem3.getMonContact().getId(), chatSystem2.getMonContact().getId());
+        assertNotEquals(chatSystem1.getMonContact().getId(), chatSystem3.getMonContact().getId());
     }
 
     @Test
     public void testChoosePseudo() {
         chatSystem1.start("chat1");
         chatSystem2.start("chat2");
+        chatSystem3.start("chat2"); // same pseudo as chatSystem2, should fail
 
 
         //chatSystem3.start("chat2");
@@ -59,17 +64,13 @@ public class ChatSystemTest {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+
         }
         //TODO:faut inverser ( assertEquals (expected,actual) ) et pas l'inverse
         //Passed
-        assertEquals(chatSystem1.getMonContact().getPseudo(), "chat1");
-        assertEquals(chatSystem2.getMonContact().getPseudo(), "chat2");
-        //Didnt passed
-        //TODO:Pour vérifier qu'il a bien pas de pseudo, faut juste regarder si il est bien mort lorsque c'est stabilisé
-        //assertEquals(Contact.NO_PSEUDO, chatSystem2.getMonContact().getPseudo()); // Asked the same pseudo therefore it should not have a pseudo
-
-        //chatSystem3.closeChat();
+        assertEquals("chat1", chatSystem1.getMonContact().getPseudo());
+        assertEquals("chat2", chatSystem2.getMonContact().getPseudo());
+        assertFalse(chatSystem3.isOpen());
     }
 
     @Test
@@ -79,7 +80,7 @@ public class ChatSystemTest {
         chatSystem3.start("chat3");
 
         try {
-            Thread.sleep(7000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

@@ -55,7 +55,7 @@ public class UDP_Server extends Thread {
     public void run() {
         while(!this.isInterrupted()) {
             try {
-                Thread.sleep(100); //TODO get rid of this but not now
+                Thread.sleep(10); //TODO get rid of this but not now
                 DatagramPacket packet = listen();
 
                 // extract and print message
@@ -71,6 +71,7 @@ public class UDP_Server extends Thread {
                 }
             } catch (Exception e) {
                 LOGGER.error("Receive error: " + e.getMessage());
+                this.interrupt();
             }
         }
     }
