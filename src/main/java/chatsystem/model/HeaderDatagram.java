@@ -1,4 +1,4 @@
-package chatsystem.ContactDiscoveryLib;
+package chatsystem.model;
 
 /** Enum class that contains every header type */
 public enum HeaderDatagram {

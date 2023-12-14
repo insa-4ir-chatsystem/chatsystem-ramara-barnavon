@@ -2,9 +2,8 @@ package chatsystem;
 
 import chatsystem.ContactDiscoveryLib.Contact;
 import chatsystem.ContactDiscoveryLib.ContactsManager;
-import chatsystem.ContactDiscoveryLib.DatagramManager;
+import chatsystem.model.DatagramManager;
 import chatsystem.network.UDP_Client;
-import chatsystem.network.UDP_Message;
 import chatsystem.network.UDP_Server;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,6 +29,7 @@ public class ChatSystem { //instance de chat sur une machine
     private String ip;
     private int port;
     private boolean pseudoAccepted;
+    private boolean cgmPseudoAccepted;
     private boolean IDAccepted;
     private UDP_Server udpServer;
     private InetAddress broadcastAddress;
@@ -124,6 +124,17 @@ public class ChatSystem { //instance de chat sur une machine
                             IDAccepted = false;
                             cm.setIdMax(suggest_id);
                             break;
+                        case CHPS: //
+                            String his_newPseudo = DatagramManager.XXPSToPseudo(msg);
+
+                            if (cm.searchContactByPseudo(his_newPseudo) != null || (monContact != null && his_newPseudo == monContact.getPseudo())) { //Si le pseudo existe déjà
+                                UDP_Client.send_RECH(received.origin(), this.port, DatagramManager.getPort(msg));
+                            } //else on fait rien il ( il supposera que oui tant que personne lui dit non )
+
+                            break;
+                        case RECH: // Si le pseudo demandé est refusé par un contact
+                            cgmPseudoAccepted = false;
+                            break;
 
                         case NULL:
                             break; //On skip le paquet
@@ -203,13 +214,11 @@ public class ChatSystem { //instance de chat sur une machine
         
     }
 
-
-
     private synchronized String choosePseudo(String pseudo){
         pseudoAccepted = true;
         for(int p : Main.portList){ // TODO: Changer ce mécanisme dégueulasse quand on passera au cas réel sur des IPs
             if(p == this.port) continue;
-            try {// TODO: good idea try catch here ?
+            try {// TODO: SE POSER LA QUESTION DE SI UNE EXCEPTION DOIT INTERROMPRE NOTRE PROGRAMME
                 UDP_Client.send_DEPS(broadcastAddress,port,  p, pseudo);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -229,12 +238,12 @@ public class ChatSystem { //instance de chat sur une machine
 
         return pseudo;
     }
-    private String changePseudo(String pseudo){
-        pseudoAccepted = true;
+    protected synchronized String changePseudo(String pseudo){
+        cgmPseudoAccepted = true;
         for(int p : Main.portList){
             if(p == this.port) continue;
             try {
-                UDP_Client.send_DEPS(broadcastAddress,port,  p, pseudo);
+                UDP_Client.send_CHPS(broadcastAddress,port,  p, pseudo);
             }catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -244,20 +253,15 @@ public class ChatSystem { //instance de chat sur une machine
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        if(!pseudoAccepted){
+        if(!cgmPseudoAccepted){
             LOGGER.error("Pseudo " + pseudo + " non disponible, fermeture du chat ----------------------- ");
-            closeChat(); // Fermeture du chat, solution temporaire
+
         } else {
-            LOGGER.info("Pseudo accepté et unique: " + pseudo +"------------------------------------------");
+            LOGGER.info("Pseudo accepté et unique: " + pseudo);
         }
 
         return pseudo;
     }
-
-
-
-
-
 
 
 

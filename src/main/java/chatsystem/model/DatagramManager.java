@@ -1,5 +1,7 @@
-package chatsystem.ContactDiscoveryLib;
+package chatsystem.model;
 
+
+import chatsystem.ContactDiscoveryLib.Contact;
 
 /** This class handle different message received */
 public class DatagramManager {

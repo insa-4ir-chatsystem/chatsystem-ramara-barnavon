@@ -1,9 +1,9 @@
-package chatsystem.ContactDiscoveryLib;
+package chatsystem;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import chatsystem.ChatSystem;
-import chatsystem.Main;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +20,7 @@ public class ChatSystemTest {
     private ChatSystem chatSystem4;
     private ChatSystem chatSystem5;
     private ChatSystem chatSystem6;
+    private static final Logger LOGGER = LogManager.getLogger(ChatSystemTest.class);
 
     @BeforeEach
     public void setUp() {
@@ -85,7 +86,7 @@ public class ChatSystemTest {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
-
+            LOGGER.debug("Interrompu dans un sleep de "+ Thread.currentThread().getName());
         }
         //TODO:faut inverser ( assertEquals (expected,actual) ) et pas l'inverse
         //Passed
@@ -103,7 +104,7 @@ public class ChatSystemTest {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            LOGGER.debug("Interrompu dans un sleep de "+ Thread.currentThread().getName());
         }
 
 
@@ -118,6 +119,25 @@ public class ChatSystemTest {
         assertTrue(chatSystem3.getCm().getContactList().contains(chatSystem2.getMonContact()));
 
         chatSystem3.closeChat();
+    }
+    @Test
+    public void testChangePseudo() {
+        chatSystem1.start("chat1");
+        chatSystem2.start("chat2");
+        chatSystem3.start("chat3");
+
+        try {
+            Thread.sleep(1000);
+            chatSystem1.changePseudo("chatChanger");//TODO:assigner le pseudo changé
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            LOGGER.debug("Interrompu dans un sleep de "+ Thread.currentThread().getName());
+        }
+
+        //Il faut tester que le nom de chat1 à changer en chatChanger
+        assertEquals("chatChanger", chatSystem1.getMonContact().getPseudo());
+        //Il faut tester que le nom c'est mis à jour chez les autres
+
     }
 
 }

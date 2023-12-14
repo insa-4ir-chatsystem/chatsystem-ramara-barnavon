@@ -1,5 +1,6 @@
 package chatsystem;
 
+import chatsystem.view.GUI;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,7 +23,8 @@ public class Main {
         int portZ = 2025;
         int portM = 1789;
         int portDouble = 2026;
-
+        GUI gui = new GUI();
+        gui.start();
         //TODO: JIRA
 
         portList = new ArrayList<Integer>();
