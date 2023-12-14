@@ -17,6 +17,9 @@ public class ChatSystemTest {
     private ChatSystem chatSystem1;
     private ChatSystem chatSystem2;
     private ChatSystem chatSystem3;
+    private ChatSystem chatSystem4;
+    private ChatSystem chatSystem5;
+    private ChatSystem chatSystem6;
 
     @BeforeEach
     public void setUp() {
@@ -24,10 +27,22 @@ public class ChatSystemTest {
         chatSystem1 = new ChatSystem("127.0.0.1", 8080);
         chatSystem2 = new ChatSystem("127.0.0.1", 8081);
         chatSystem3 = new ChatSystem("127.0.0.1", 8082);
+        /*
+        chatSystem4 = new ChatSystem("127.0.0.1", 8083);
+        chatSystem5 = new ChatSystem("127.0.0.1", 8084);
+        chatSystem6 = new ChatSystem("127.0.0.1", 8085);
+
+         */
         Main.portList = new ArrayList<Integer>();
         Main.portList.add(8080);
         Main.portList.add(8081);
         Main.portList.add(8082);
+        /*
+        Main.portList.add(8083);
+        Main.portList.add(8084);
+        Main.portList.add(8085);
+
+         */
         //chatSystem1.start("chat1");
         //chatSystem2.start("chat2");
     }
@@ -37,6 +52,12 @@ public class ChatSystemTest {
         chatSystem1.closeChat();
         chatSystem2.closeChat();
         chatSystem3.closeChat();
+        /*
+        chatSystem4.closeChat();
+        chatSystem5.closeChat();
+        chatSystem6.closeChat();
+
+         */
 
         System.out.println("reset");
     }

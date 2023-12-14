@@ -4,6 +4,7 @@ import chatsystem.ContactDiscoveryLib.Contact;
 import chatsystem.ContactDiscoveryLib.ContactsManager;
 import chatsystem.ContactDiscoveryLib.DatagramManager;
 import chatsystem.network.UDP_Client;
+import chatsystem.network.UDP_Message;
 import chatsystem.network.UDP_Server;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -76,11 +77,11 @@ public class ChatSystem { //instance de chat sur une machine
 
     /** Starts an instance of ChatSystem */
 
-    public void start(String pseudoAsked){
+    public synchronized void start(String pseudoAsked){
         LOGGER.info("Lancement du chatsystem : " + pseudoAsked);
         startServer();
 
-        udpServer.addObserver(received -> {
+        udpServer.addObserver((received, port) -> {
             try {
 
                 if (received != null) {
@@ -93,7 +94,7 @@ public class ChatSystem { //instance de chat sur une machine
 
                         case DECO: //On reçoit une demande de contact, on souhaite renvoyer notre contact au destinaire
                             if ((monContact != null && (monContact.getId() != -1))) {
-                                UDP_Client.send_INCO(received.origin(), port, monContact);
+                                UDP_Client.send_INCO(received.origin(), this.port, DatagramManager.getPort(msg), monContact);
                             }
                             break;
 
@@ -105,7 +106,7 @@ public class ChatSystem { //instance de chat sur une machine
                             String his_pseudo = DatagramManager.XXPSToPseudo(msg);
 
                             if (cm.searchContactByPseudo(his_pseudo) != null || (monContact != null && his_pseudo == monContact.getPseudo())) { //Si le pseudo existe déjà
-                                UDP_Client.send_REPS(received.origin(), port);
+                                UDP_Client.send_REPS(received.origin(), this.port, DatagramManager.getPort(msg));
                             } //else on fait rien il ( il supposera que oui tant que personne lui dit non )
 
                             break;
@@ -113,8 +114,8 @@ public class ChatSystem { //instance de chat sur une machine
                         case DEID: //si l'ID existe il refuse avec un id_conseillé ( le max + 1 de sa liste ) si l'ID n'existe pas, il renvoie rien
                             int his_id = DatagramManager.XXIDToId(msg);
                             if (his_id <= cm.getIdMax()) { //Si l'id existe déjà
-                                UDP_Client.send_REID(received.origin(), port, his_id + 1); //on renvoie refus et on donne l'id conseillé
-                                cm.setIdMax(his_id + 1);
+                                UDP_Client.send_REID(received.origin(), this.port, DatagramManager.getPort(msg), his_id + 1); //on renvoie refus et on donne l'id conseillé
+                                //cm.setIdMax(his_id + 1);
                             } //else on fait rien il ( il supposera que oui tant que personne lui dit non )
                             break;
 
@@ -176,21 +177,21 @@ public class ChatSystem { //instance de chat sur une machine
         int id = -1;
         while (!IDAccepted && ite < 20) {
             ite++;
-            IDAccepted = true;//Celui qui lui dit refus va être quelqu'un qui est plus haut donc il est censé lui renvoyer un idmax encore + haut
+            IDAccepted = true;
             if(ite == 20) IDAccepted = false;
             id = cm.getIdMax();
             cm.setIdMax(id);
             for (int p : Main.portList) { // TODO: Changer ce mécanisme dégueulasse quand on passera au cas réel sur des IPs
                 if (p == this.port) continue;
                 try { // TODO: good idea try catch here ?
-                    UDP_Client.send_DEID(broadcastAddress, p, id);
+                    UDP_Client.send_DEID(broadcastAddress, port,  p, id);
                     LOGGER.info("Je suis "+ Thread.currentThread().getName() + " et je demande mon id = " + id);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
             try {
-                Thread.sleep(2500);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -198,24 +199,24 @@ public class ChatSystem { //instance de chat sur une machine
         if(IDAccepted){
             LOGGER.info("Id accepté et unique : " + id + " =================================");
             return id;
-        }else { return -1; }
+        }else { return -1; } //TODO: mettre une exception ici
         
     }
 
 
 
-    private String choosePseudo(String pseudo){
+    private synchronized String choosePseudo(String pseudo){
         pseudoAccepted = true;
         for(int p : Main.portList){ // TODO: Changer ce mécanisme dégueulasse quand on passera au cas réel sur des IPs
             if(p == this.port) continue;
             try {// TODO: good idea try catch here ?
-                UDP_Client.send_DEPS(broadcastAddress, p, pseudo);
+                UDP_Client.send_DEPS(broadcastAddress,port,  p, pseudo);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
         try { // wait for others to respond
-            Thread.sleep(2500);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -233,7 +234,7 @@ public class ChatSystem { //instance de chat sur une machine
         for(int p : Main.portList){
             if(p == this.port) continue;
             try {
-                UDP_Client.send_DEPS(broadcastAddress, p, pseudo);
+                UDP_Client.send_DEPS(broadcastAddress,port,  p, pseudo);
             }catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -305,7 +306,7 @@ public class ChatSystem { //instance de chat sur une machine
                 for (int p : Main.portList) { // TODO: Changer ce mécanisme déguelasse quand on passera au cas réel sur un intranet
                     if (p == port) continue;
                     try {// TODO: good idea try catch here ?
-                        UDP_Client.send_DECO(broadcastAddress, p);
+                        UDP_Client.send_DECO(broadcastAddress,port, p);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

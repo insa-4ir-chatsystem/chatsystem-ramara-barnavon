@@ -26,43 +26,43 @@ public class UDP_Client {
         socket.close();
     }
 
-    public static void send_INCO(InetAddress addr, int port, Contact contact) throws IOException{
-        String msg_to_send = "INCO" + ":" + contact.getPseudo() + ":" + contact.getId();
+    public static void send_INCO(InetAddress addr, int localPort, int port, Contact contact) throws IOException{
+        String msg_to_send = "INCO" + ":" + contact.getPseudo() + ":" + contact.getId() + ":" + localPort;
             send(addr, port, msg_to_send);
     }
 
-    public static void send_DECO(InetAddress addr, int port) throws IOException{
-        String msg_to_send = "DECO";
+    public static void send_DECO(InetAddress addr, int localPort, int port) throws IOException{
+        String msg_to_send = "DECO" + ":" + localPort;
             send(addr, port, msg_to_send);
     }
 
-    public static void send_DEPS(InetAddress addr, int port, String pseudo) throws IOException{
-        String msg_to_send = "DEPS" + ":" + pseudo;
+    public static void send_DEPS(InetAddress addr, int localPort, int port, String pseudo) throws IOException{
+        String msg_to_send = "DEPS" + ":" + pseudo + ":" + localPort;
             send(addr, port, msg_to_send);
     }
 
-    public static void send_REPS(InetAddress addr, int port) throws IOException{
-        String msg_to_send = "REPS";
-        send(addr, port, msg_to_send);
+    public static void send_REPS(InetAddress addr, int localPort, int destPort) throws IOException{
+        String msg_to_send = "REPS:" + localPort;
+        send(addr, destPort, msg_to_send);
     }
 
-    public static void send_DEID(InetAddress addr, int port, int id_voulu) throws IOException{
-        String msg_to_send = "DEID"+ ":" + id_voulu;
-        send(addr, port, msg_to_send);
+    public static void send_DEID(InetAddress addr, int localPort, int destPort, int id_voulu) throws IOException{
+        String msg_to_send = "DEID"+ ":" + id_voulu + ":" + localPort;
+        send(addr, destPort, msg_to_send);
     }
 
 
-    public static void send_REID(InetAddress addr, int port, int id) throws IOException{
-        String msg_to_send = "REID" + ":" + id;
-        send(addr, port, msg_to_send);
+    public static void send_REID(InetAddress addr, int localPort, int destPort, int id) throws IOException{
+        String msg_to_send = "REID"  + ":" + id + ":" + localPort;
+        send(addr, destPort, msg_to_send);
     }
-    public static void send_CHPS(InetAddress addr, int port, String pseudo) throws IOException{
-        String msg_to_send = "CHPS" + ":" + pseudo;
-        send(addr, port, msg_to_send);
+    public static void send_CHPS(InetAddress addr, int localPort, int destPort, String pseudo) throws IOException{
+        String msg_to_send = "CHPS"  + ":" + pseudo+ ":" + localPort;
+        send(addr, destPort, msg_to_send);
     }
-    public static void send_RECH(InetAddress addr, int port) throws IOException{
-        String msg_to_send = "RECH";
-        send(addr, port, msg_to_send);
+    public static void send_RECH(InetAddress addr, int localPort, int destPort) throws IOException{
+        String msg_to_send = "RECH:" + localPort;
+        send(addr, destPort, msg_to_send);
     }
 
     public static void sendLocalhost(int port, String message) throws IOException {

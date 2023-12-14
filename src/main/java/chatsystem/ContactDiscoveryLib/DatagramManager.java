@@ -19,7 +19,6 @@ public class DatagramManager {
         String[] parties = mess.split(":");
         int id = Integer.parseInt(parties[1]);
         return id;
-
     }
     public static String XXPSToPseudo(String mess) {
         String[] parties = mess.split(":");
@@ -31,6 +30,14 @@ public class DatagramManager {
         int id = Integer.parseInt(parties[1]);
         return id;
     }*/
+
+    /** Gets the origin port of the incoming message */
+
+    public static int getPort(String mess){
+        String[] parties = mess.split(":");
+        String port = parties[parties.length-1];
+        return Integer.parseInt(port);
+    }
 
 
 

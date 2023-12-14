@@ -18,7 +18,7 @@ public class UDP_Server extends Thread {
     /** Interface that observers of the UDP server must implement. */
     public interface Observer {
         /** Method that is called each time a message is received. */
-        void handle(UDP_Message received);
+        void handle(UDP_Message received, int port);
     }
 
 
@@ -55,18 +55,17 @@ public class UDP_Server extends Thread {
     public void run() {
         while(!this.isInterrupted()) {
             try {
-                Thread.sleep(10); //TODO get rid of this but not now
                 DatagramPacket packet = listen();
 
                 // extract and print message
                 String received = new String(packet.getData(), 0, packet.getLength());
                 UDP_Message message = new UDP_Message(received, packet.getAddress());
-
+                int port = packet.getPort();
                 LOGGER.trace("Received on port " + socket.getLocalPort() + ": " + message.content() + " from " + message.origin());
 
                 synchronized (this.observers) {
                     for (Observer obs : this.observers) {
-                        obs.handle(message);
+                        obs.handle(message, port);
                     }
                 }
             } catch (Exception e) {
