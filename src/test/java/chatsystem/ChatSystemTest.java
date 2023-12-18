@@ -2,6 +2,7 @@ package chatsystem;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import chatsystem.ContactDiscoveryLib.Contact;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
@@ -49,7 +50,7 @@ public class ChatSystemTest {
     }
 
     @AfterEach
-    public void reset(){ //TODO:Mieux reset pour que les tests puissent s'enchainer
+    public void reset(){
         chatSystem1.closeChat();
         chatSystem2.closeChat();
         chatSystem3.closeChat();
@@ -88,7 +89,7 @@ public class ChatSystemTest {
         } catch (InterruptedException e) {
             LOGGER.debug("Interrompu dans un sleep de "+ Thread.currentThread().getName());
         }
-        //TODO:faut inverser ( assertEquals (expected,actual) ) et pas l'inverse
+
         //Passed
         assertEquals("chat1", chatSystem1.getMonContact().getPseudo());
         assertEquals("chat2", chatSystem2.getMonContact().getPseudo());
@@ -108,7 +109,7 @@ public class ChatSystemTest {
         }
 
 
-
+        String old_pseudo = chatSystem3.getMonContact().getPseudo();
         assertTrue(chatSystem1.getCm().getContactList().contains(chatSystem2.getMonContact()));
         assertTrue(chatSystem1.getCm().getContactList().contains(chatSystem3.getMonContact()));
 
@@ -117,7 +118,18 @@ public class ChatSystemTest {
 
         assertTrue(chatSystem3.getCm().getContactList().contains(chatSystem1.getMonContact()));
         assertTrue(chatSystem3.getCm().getContactList().contains(chatSystem2.getMonContact()));
+        chatSystem3.changePseudo("chatChanger");
+        try {
+            Thread.sleep(30000);
+        } catch (InterruptedException e) {
+            LOGGER.debug("Interrompu dans un sleep de "+ Thread.currentThread().getName());
+        }
+        /** On veut vérifier ici que un contact qui change de pseudo est actualisé sur la lan */
+        assertTrue(chatSystem2.getCm().getContactList().contains(chatSystem3.getMonContact()));
+        assertTrue(chatSystem1.getCm().getContactList().contains(chatSystem3.getMonContact()));
 
+        /** On veut aussi vérifier que le pseudo de base n'existe plus */
+        assertTrue(chatSystem2.getCm().searchContactByPseudo(old_pseudo) == null);
         chatSystem3.closeChat();
     }
     @Test
@@ -128,7 +140,7 @@ public class ChatSystemTest {
 
         try {
             Thread.sleep(1000);
-            chatSystem1.changePseudo("chatChanger");//TODO:assigner le pseudo changé
+            chatSystem1.changePseudo("chatChanger");
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             LOGGER.debug("Interrompu dans un sleep de "+ Thread.currentThread().getName());
@@ -136,7 +148,8 @@ public class ChatSystemTest {
 
         //Il faut tester que le nom de chat1 à changer en chatChanger
         assertEquals("chatChanger", chatSystem1.getMonContact().getPseudo());
-        //Il faut tester que le nom c'est mis à jour chez les autres
+        //Il faut tester que le nom c'est mis à jour chez les autres cf contact gathering
+
 
     }
 

@@ -2,18 +2,22 @@ package chatsystem.model;
 
 
 import chatsystem.ContactDiscoveryLib.Contact;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /** This class handle different message received */
 public class DatagramManager {
-
+    private static final Logger LOGGER = LogManager.getLogger(DatagramManager.class);
     /** INCO is the header to be handled here */
     public static Contact INCOToContact(String mess){
 
         String[] parties = mess.split(":");
         String pseudo = parties[1];
         int id = Integer.parseInt(parties[2]);
-
-        return new Contact(pseudo, id);
+        Contact contact = new Contact(pseudo,id);
+        LOGGER.debug("INCO de " + contact + "envoyé");
+        return contact;
     }
 
     /** DEID and REID are the header to be handled here */
@@ -26,6 +30,11 @@ public class DatagramManager {
         String[] parties = mess.split(":");
         String pseudo = parties[1];
         return pseudo;
+    }
+    public static Integer XXPSToID(String mess) {
+        String[] parties = mess.split(":");
+        Integer id = Integer.valueOf(parties[3]);
+        return id;
     }
     /*public static int REID_to_id(String mess) {
         String[] parties = mess.split(":");

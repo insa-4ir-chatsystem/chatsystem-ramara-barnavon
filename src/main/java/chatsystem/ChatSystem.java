@@ -87,7 +87,7 @@ public class ChatSystem { //instance de chat sur une machine
                 if (received != null) {
                     String msg = received.content();
 
-                    switch (DatagramManager.getHeader(msg)) {
+                    switch (DatagramManager.getHeader(msg)) { //TODO : y'a plein de nom sos forme "nom_de_X" à mettre en "nomDeX"
                         case INCO: // On reçoit une info de contact, il faut l'ajouter à notre liste de contacts
                             cm.updateContact(DatagramManager.INCOToContact(msg));
                             break;
@@ -125,11 +125,12 @@ public class ChatSystem { //instance de chat sur une machine
                             cm.setIdMax(suggest_id);
                             break;
                         case CHPS: //
-                            String his_newPseudo = DatagramManager.XXPSToPseudo(msg);
-
-                            if (cm.searchContactByPseudo(his_newPseudo) != null || (monContact != null && his_newPseudo == monContact.getPseudo())) { //Si le pseudo existe déjà
+                            String hisNewPseudo = DatagramManager.XXPSToPseudo(msg);
+                            Integer hisOldID = DatagramManager.XXPSToID(msg);
+                            if (cm.searchContactByPseudo(hisNewPseudo) != null || (monContact != null && hisNewPseudo == monContact.getPseudo())) { //Si le pseudo existe déjà
                                 UDP_Client.send_RECH(received.origin(), this.port, DatagramManager.getPort(msg));
-                            } //else on fait rien il ( il supposera que oui tant que personne lui dit non )
+                                /** ( l'emetteur supposera que c'est bon tant que personne lui refuse son nouveau pseudo )*/
+                            }
 
                             break;
                         case RECH: // Si le pseudo demandé est refusé par un contact
@@ -208,7 +209,7 @@ public class ChatSystem { //instance de chat sur une machine
             }
         }
         if(IDAccepted){
-            LOGGER.info("Id accepté et unique : " + id + " =================================");
+            LOGGER.info("Id accepté et unique : " + id );
             return id;
         }else { return -1; } //TODO: mettre une exception ici
         
@@ -238,12 +239,12 @@ public class ChatSystem { //instance de chat sur une machine
 
         return pseudo;
     }
-    protected synchronized String changePseudo(String pseudo){
+    protected synchronized void changePseudo(String pseudo){
         cgmPseudoAccepted = true;
         for(int p : Main.portList){
             if(p == this.port) continue;
             try {
-                UDP_Client.send_CHPS(broadcastAddress,port,  p, pseudo);
+                UDP_Client.send_CHPS(broadcastAddress,port,  p, pseudo, this.getMonContact().getId());
             }catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -254,13 +255,17 @@ public class ChatSystem { //instance de chat sur une machine
             throw new RuntimeException(e);
         }
         if(!cgmPseudoAccepted){
-            LOGGER.error("Pseudo " + pseudo + " non disponible, fermeture du chat ----------------------- ");
+            LOGGER.info("Pseudo " + pseudo + " non disponible, veuillez reesayer avec un pseudo différent");
 
         } else {
+            this.monContact.setPseudo(pseudo);
+            UCT.setName("UCT Thread - " + this.monContact.getPseudo());
+            cm.setMonContact(this.monContact);
+            LOGGER.debug("Chatsystem " + monContact.getPseudo() + " changed correctly");
             LOGGER.info("Pseudo accepté et unique: " + pseudo);
         }
 
-        return pseudo;
+
     }
 
 

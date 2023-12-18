@@ -56,8 +56,8 @@ public class UDP_Client {
         String msg_to_send = "REID"  + ":" + id + ":" + localPort;
         send(addr, destPort, msg_to_send);
     }
-    public static void send_CHPS(InetAddress addr, int localPort, int destPort, String pseudo) throws IOException{
-        String msg_to_send = "CHPS"  + ":" + pseudo+ ":" + localPort;
+    public static void send_CHPS(InetAddress addr, int localPort, int destPort, String pseudo, int id) throws IOException{
+        String msg_to_send = "CHPS"  + ":" + pseudo+ ":" + localPort + ":" + id;
         send(addr, destPort, msg_to_send);
     }
     public static void send_RECH(InetAddress addr, int localPort, int destPort) throws IOException{

@@ -43,22 +43,25 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
 
     public synchronized void updateContact(Contact c) {
         if (c.getPseudo() != Contact.NO_PSEUDO) {
-            if (contactList.contains(c)) {
-                //System.out.println("Déjà présent dans la liste, mise à jour du TTL");
-                Contact contact = searchContactById(c.getId());
+            if (contactList.contains(c)) { //contains marche que avec l'id
+                LOGGER.debug("Déjà présent dans la liste, mise à jour du TTL et du pseudo");
+                Contact contact = searchContactByID(c.getId());
+                contact.setPseudo(c.getPseudo());
                 contact.setTTL(4);
+                contact.setOnline(true);
             } else {
                 c.setTTL(4);
+                c.setOnline(true);
                 contactList.add(c);
-                //System.out.println("Add to contact list : " + c);
+                LOGGER.debug("Add to contact list : " + c);
                 this.idMax = Math.max(this.idMax, c.getId());
             }
         }
     }
 
-    public synchronized Contact searchContactById(int contact){
+    public synchronized Contact searchContactByID(int id){//TODO:Il faut que l'argument soit un id et pas un contact
         for(Contact c : this.contactList){
-            if (c.getId() == (contact)){
+            if (c.getId() == (id)){
                 return c;
             }
         }
@@ -76,13 +79,13 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
 
     public synchronized void decreaseTTL() {
         Iterator<Contact> iterator = this.contactList.iterator();
-        while (iterator.hasNext()) {
+        LOGGER.info("List of contact to be ttldecreased : " + contactList);
+        while (iterator.hasNext()) { //strange because needed before
             Contact c = iterator.next();
             c.decrementTTL();
             if (c.getTTL() <= 0) {
-                iterator.remove();
-                LOGGER.info("{" + c.getPseudo() + "}  TTl expiré, contact retiré : " + c); //TODO: ptete que ce serait sympa de savoir c'est sur la liste de qui qu'il est retiré
-                //System.out.println("M");
+                c.setOnline(false);
+                LOGGER.info("{" + c.getPseudo() + "}  TTl expiré, contact retiré : " + c);
             }
         }
     }
@@ -97,4 +100,5 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
             LOGGER.info("Liste de contacts de " + monContact + " est vide");
         }
     }
+
 }

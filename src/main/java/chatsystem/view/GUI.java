@@ -1,10 +1,13 @@
 package chatsystem.view;
 
 
+import chatsystem.ContactDiscoveryLib.Contact;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
@@ -22,7 +25,7 @@ public class GUI {
 
 
         ViewManager MainVM = new ViewManager();
-        ViewManager ChatVM = new ViewManager();
+        ViewManager ChatVM = new ViewManager(); // To display the right Chat instance
 
         // Create and set up the window.
         JFrame frame = new JFrame("Clavard'App");
@@ -64,24 +67,30 @@ public class GUI {
 
         JLabel chattingTitle = new JLabel("Start chatting with your contacts", JLabel.CENTER);
 
-        //TODO: verifier les definitions du gui
-        // Create panels for contact list, chat history, and input section
         JPanel contactListPanel = new JPanel(new BorderLayout());
-        JPanel chatHistoryPanel = new JPanel(new BorderLayout());
+        JPanel EmptyChatHistoryPanel = new JPanel(new BorderLayout());
         JPanel inputPanel = new JPanel(new BorderLayout());
         JPanel contactInputPanel = new JPanel(new FlowLayout()); // Panel for contact input
 
+        JPanel contactListInnerPanel = new JPanel();
+        contactListInnerPanel.setLayout(new BoxLayout(contactListInnerPanel, BoxLayout.Y_AXIS));
+
         // Add components to the contact list panel
+        JScrollPane contactScrollPane = new JScrollPane(contactListInnerPanel);
+
         contactListPanel.add(new JLabel("Contact List"), BorderLayout.NORTH);
-        // Add your contact list components here
+        contactListPanel.add(contactScrollPane, BorderLayout.CENTER);
+
+        ContactItem itemTest = new ContactItem(new Contact("pseudoTest", 12));
+        contactListInnerPanel.add(itemTest);
 
         // Add components to the chat history panel
         JTextArea chatHistory = new JTextArea();
         JScrollPane chatScrollPane = new JScrollPane(chatHistory);
         chatHistory.setEditable(false);
         chatHistory.setLineWrap(true);
-        chatHistory.setWrapStyleWord(true);
-        chatHistoryPanel.add(chatScrollPane, BorderLayout.CENTER);
+        chatHistory.setWrapStyleWord(true); // go to next line at the end of the word
+        EmptyChatHistoryPanel.add(chatScrollPane, BorderLayout.CENTER);
 
         // Add components to the input panel for sending messages
         JTextField messageField = new JTextField(20);
@@ -97,21 +106,24 @@ public class GUI {
         contactListPanel.add(contactInputPanel, BorderLayout.SOUTH);
 
         // Create a split pane for contact list and chat history
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, contactListPanel, chatHistoryPanel);
-        splitPane.setResizeWeight(0.2); // Adjust the divider location
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, contactListPanel, EmptyChatHistoryPanel);
+        //splitPane.setResizeWeight(0.1); // Adjust the divider location
 
         // Add the split pane and input panel to the frame
         frame.add(splitPane, BorderLayout.CENTER);
         frame.add(inputPanel, BorderLayout.SOUTH);
 
 
-        frame.setSize(800, 600);
+        frame.setSize(1400, 600);
         frame.setVisible(true);
 
         //MainVM.setViewOfFrame(frame, Sign)
     }
 
 
+    public static void addMessage(String message , Contact contact/* A way to identify who the sender is (and local/distant) */){
+
+    }
     public static void start() {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -121,6 +133,7 @@ public class GUI {
         });
 
     }
+
 
     /** A few ActionListeners definitions */
 
@@ -143,55 +156,73 @@ public class GUI {
 
     }
 
-    /** This ActionListener changes the form of the current JPanel */
-    public static class ChangeForm implements ActionListener {
+    public static class ChangeActiveChat implements ActionListener {
         private JPanel View;
         private ViewManager VM;
-        private Component form;
-        private int index;
+        private JFrame frame;
 
-        public ChangeForm(Component form, ViewManager VM, JPanel View, int index) {
+        public ChangeActiveChat(JFrame frame, ViewManager VM, JPanel View) {
             this.View = View;
             this.VM = VM;
-            this.form = form;
-            this.index = index;
+            this.frame = frame;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            View.remove(this.index);
-            VM.setView(form);
-            View.add(form, this.index);
-            View.revalidate();
-            View.repaint();
+            VM.setViewOfFrame(frame, View);
         }
 
     }
 
-    /** This ActionListener changes the label of the current JPanel */
-    public static class ChangeLabel implements ActionListener {
-        private JPanel View;
-        private ViewManager VM;
-        private Component label;
-        private int index;
+    public static class ContactItem extends JPanel{
+        private boolean hovered = false;
+        JLabel pseudo;
+        JLabel onlineMark;
+        Contact contact;
 
-        public ChangeLabel(Component label, ViewManager VM, JPanel View, int index) {
-            this.View = View;
-            this.VM = VM;
-            this.label = label;
-            this.index = index;
+        public ContactItem(Contact contact){
+            super(new FlowLayout());
+            this.contact = contact;
+            this.setUpPanel();
         }
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            View.remove(this.index);
-            VM.setView(label);
-            View.add(label, this.index);
-            View.revalidate();
-            View.repaint();
+        private void setUpPanel(){
+            pseudo = new JLabel(this.contact.getPseudo());
+            onlineMark = new JLabel();
+
+            onlineMark.setOpaque(true);
+            onlineMark.setBackground(Color.GREEN);
+            onlineMark.setPreferredSize(new Dimension(10, 10));
+
+            this.add(pseudo);
+            this.add(onlineMark);
+
+            addMouseListener(new MouseAdapter() {
+                /* To add a hover effect but it is not needed
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    hovered = true;
+                    repaint(); // Redraw the panel to reflect the hover effect
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    hovered = false;
+                    repaint(); // Redraw the panel to remove the hover effect
+                }
+                 */
+                @Override
+                public void mouseClicked(MouseEvent e) {
+
+                }
+            });
+
+
         }
+
 
     }
+
 
 
 }

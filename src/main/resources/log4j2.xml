@@ -10,7 +10,7 @@
         </File> -->
     </Appenders>
     <Loggers>
-        <Root level="info">
+        <Root level="trace">
             <AppenderRef ref="ConsoleAppender" />
             <!-- To write logs to a file
             <AppenderRef ref="FileAppender"/>
