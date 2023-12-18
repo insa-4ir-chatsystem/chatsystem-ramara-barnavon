@@ -8,7 +8,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 
 import java.lang.module.Configuration;
 import java.util.ArrayList;
-//TODO : adapter les LOGGERs pour 
+//TODO : adapter les LOGGER INFO pour éviter un surchargement
 public class Main {
 
     public static ArrayList<Integer> portList;

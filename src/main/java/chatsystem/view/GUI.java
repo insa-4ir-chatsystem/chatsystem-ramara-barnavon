@@ -2,6 +2,7 @@ package chatsystem.view;
 
 
 import chatsystem.ContactDiscoveryLib.Contact;
+import chatsystem.ContactDiscoveryLib.ContactsManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,11 +20,9 @@ public class GUI {
     private static final Logger LOGGER = LogManager.getLogger(GUI.class);
     private static void createAndShowGUI() {
 
-        final int[] UID = {-1};
-        final Color GREEN = new Color(60, 252, 60, 255);
-        final Color RED = new Color(255, 32, 32, 255);
+        //final int[] UID = {-1};
 
-
+        //TODO : Mettrre a jour le GUI quand On reçoit des messages
         ViewManager MainVM = new ViewManager();
         ViewManager ChatVM = new ViewManager(); // To display the right Chat instance
 
@@ -36,7 +35,7 @@ public class GUI {
         JPanel Chatting = MainVM.createPanelView(); // Page to chat with contacts
 
         Login.setLayout(new BoxLayout(Login, BoxLayout.PAGE_AXIS));
-        Chatting.setLayout(new BoxLayout(Login, BoxLayout.PAGE_AXIS));
+        Chatting.setLayout(new BorderLayout());
 
 
 
@@ -83,6 +82,11 @@ public class GUI {
 
         ContactItem itemTest = new ContactItem(new Contact("pseudoTest", 12));
         contactListInnerPanel.add(itemTest);
+        ContactItem itemTest2 = new ContactItem(new Contact("pseudoTest2", 2));
+        contactListInnerPanel.add(itemTest2);
+        ContactItem itemTest3 = new ContactItem(new Contact("pseudoTest2", 2));
+        contactListInnerPanel.add(itemTest3);
+        itemTest2.setOffline();
 
         // Add components to the chat history panel
         JTextArea chatHistory = new JTextArea();
@@ -110,10 +114,12 @@ public class GUI {
         //splitPane.setResizeWeight(0.1); // Adjust the divider location
 
         // Add the split pane and input panel to the frame
-        frame.add(splitPane, BorderLayout.CENTER);
-        frame.add(inputPanel, BorderLayout.SOUTH);
+        Chatting.add(chattingTitle, BorderLayout.NORTH);
+        Chatting.add(splitPane, BorderLayout.CENTER);
+        Chatting.add(inputPanel, BorderLayout.SOUTH);
+        Chatting.setVisible(true);
 
-
+        frame.add(Chatting);
         frame.setSize(1400, 600);
         frame.setVisible(true);
 
@@ -121,10 +127,8 @@ public class GUI {
     }
 
 
-    public static void addMessage(String message , Contact contact/* A way to identify who the sender is (and local/distant) */){
-
-    }
     public static void start() {
+
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 createAndShowGUI();
@@ -175,49 +179,48 @@ public class GUI {
     }
 
     public static class ContactItem extends JPanel{
-        private boolean hovered = false;
         JLabel pseudo;
         JLabel onlineMark;
+        JPanel chat;
         Contact contact;
 
         public ContactItem(Contact contact){
             super(new FlowLayout());
             this.contact = contact;
+            this.chat = new JPanel(new BorderLayout());
+            this.pseudo = new JLabel(this.contact.getPseudo());
+            this.onlineMark = new JLabel();
+            
             this.setUpPanel();
         }
 
         private void setUpPanel(){
-            pseudo = new JLabel(this.contact.getPseudo());
-            onlineMark = new JLabel();
 
             onlineMark.setOpaque(true);
-            onlineMark.setBackground(Color.GREEN);
             onlineMark.setPreferredSize(new Dimension(10, 10));
+            setOnline();
 
             this.add(pseudo);
             this.add(onlineMark);
 
             addMouseListener(new MouseAdapter() {
-                /* To add a hover effect but it is not needed
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                    hovered = true;
-                    repaint(); // Redraw the panel to reflect the hover effect
-                }
-
-                @Override
-                public void mouseExited(MouseEvent e) {
-                    hovered = false;
-                    repaint(); // Redraw the panel to remove the hover effect
-                }
-                 */
                 @Override
                 public void mouseClicked(MouseEvent e) {
 
                 }
             });
+        }
+        
+        public JPanel getChat(){
+            return this.chat;
+        }
 
+        public void setOnline(){
+            onlineMark.setBackground(Color.GREEN);
+        }
 
+        public void setOffline(){
+            onlineMark.setBackground(Color.RED);
         }
 
 
