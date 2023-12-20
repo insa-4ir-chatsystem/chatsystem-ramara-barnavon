@@ -16,6 +16,11 @@ import javax.swing.*;
 
 public class GUI {
 
+    //TODO:
+    // Create one ChatView per contact
+    // Update a ChatView everytime we receive/send a message
+    // Convert local implementation to LAN
+
     private static final Logger LOGGER = LogManager.getLogger(GUI.class);
     private final ChatSystem CS;
 
