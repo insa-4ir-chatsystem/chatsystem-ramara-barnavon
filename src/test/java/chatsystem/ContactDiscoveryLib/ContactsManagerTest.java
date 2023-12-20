@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 
 public class ContactsManagerTest {
@@ -55,7 +55,7 @@ public class ContactsManagerTest {
         testContact.setTTL(0);
         testContact2.setTTL(3);
         contactsManager.decreaseTTL();
-        assertTrue(contactsManager.searchContactByID(testContact.getId()) == null); // testContact should be removed from list
+        assertFalse(contactsManager.searchContactByID(testContact.getId()).getOnline()); // testContact should be removed from list
         assertEquals(2,testContact2.getTTL()); //TTL should be decreased
     }
 
