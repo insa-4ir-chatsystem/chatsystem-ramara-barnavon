@@ -24,7 +24,7 @@ public class ContactsManagerTest {
 
     @Test
     public void testUpdateContact() {
-
+        setUp();
 
 
         // Test de mise à jour du TTL d'un contact existant
