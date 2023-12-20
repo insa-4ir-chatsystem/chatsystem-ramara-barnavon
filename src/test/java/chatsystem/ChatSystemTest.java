@@ -130,7 +130,11 @@ public class ChatSystemTest {
 
         assertTrue(chatSystem3.getCm().getContactList().contains(chatSystem1.getMonContact()));
         assertTrue(chatSystem3.getCm().getContactList().contains(chatSystem2.getMonContact()));
-        chatSystem3.changePseudo("chatChanger");
+        try {
+            chatSystem3.changePseudo("chatChanger");
+        } catch (PseudoRejectedException e) {
+            throw new RuntimeException(e);
+        }
         try {
             Thread.sleep(30000);
         } catch (InterruptedException e) {
@@ -157,8 +161,9 @@ public class ChatSystemTest {
             Thread.sleep(1000);
             chatSystem1.changePseudo("chatChanger");
             Thread.sleep(1000);
-        } catch (InterruptedException e) {
+        } catch (Exception ex) {
             LOGGER.debug("Interrompu dans un sleep de "+ Thread.currentThread().getName());
+            fail(ex.getMessage());
         }
 
         //Il faut tester que le nom de chat1 à changer en chatChanger
