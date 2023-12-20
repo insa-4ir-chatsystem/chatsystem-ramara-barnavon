@@ -120,6 +120,9 @@ public class GUI {
         // Add components to the input panel for sending messages
         JTextField messageField = new JTextField(20);
         JButton sendMessageButton = new JButton("Send");
+        JLabel infoChangePseudo = new JLabel("");
+        infoChangePseudo.setForeground(Color.RED);
+        inputPanel.add(infoChangePseudo, BorderLayout.NORTH);
         inputPanel.add(messageField, BorderLayout.CENTER);
         inputPanel.add(sendMessageButton, BorderLayout.EAST);
 
@@ -161,7 +164,6 @@ public class GUI {
                     LOGGER.trace("Chatsystem " + askedPseudo + " started correctly");
                     contactListTitle.setText("Connected as " + CS.getMonContact().getPseudo());
                     MainVM.setViewOfFrame(frame, Chatting);
-                    //TODO: switch view
                 }else{
                     loginInfo.setText("Please enter a pseudo");
                 }
@@ -171,6 +173,38 @@ public class GUI {
             }
 
         });
+
+        changePseudoButton.addActionListener(e -> {
+            String askedPseudo = pseudoFieldd.getText();
+            try {
+                if(!askedPseudo.isEmpty()){
+                    CS.changePseudo(askedPseudo);
+                    CS.getMonContact().setPseudo(askedPseudo);
+                    CS.getUCT().setName("UCT Thread - " + askedPseudo);
+                    CS.getCm().setMonContact(CS.getMonContact());
+                    LOGGER.trace("Chatsystem " + askedPseudo + " changed correctly");
+                    pseudoFieldd.setText("");
+                    contactListTitle.setText("Connected as " + CS.getMonContact().getPseudo());
+                }else{
+                    infoChangePseudo.setText("Please enter a pseudo"); //TODO: notify somewhere on the screen
+                }
+            } catch (PseudoRejectedException ex){
+                infoChangePseudo.setText("Pseudo not available");
+                pseudoFieldd.setText("");
+            }
+
+
+
+        });
+
+
+
+
+
+
+
+
+
 
 
 

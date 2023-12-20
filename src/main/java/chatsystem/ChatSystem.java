@@ -220,7 +220,7 @@ public class ChatSystem { //instance de chat sur une machine
         monContact.setPseudo(pseudo);
 
     }
-    protected synchronized void changePseudo(String pseudo){
+    public synchronized void changePseudo(String pseudo) throws PseudoRejectedException {
         cgmPseudoAccepted = true;
         for(int p : Main.portList){
             if(p == this.port) continue;
@@ -237,7 +237,7 @@ public class ChatSystem { //instance de chat sur une machine
         }
         if(!cgmPseudoAccepted){
             LOGGER.info("Pseudo " + pseudo + " non disponible, veuillez reesayer avec un pseudo différent");
-
+            throw new PseudoRejectedException(pseudo);
         } else {
             this.monContact.setPseudo(pseudo);
             UCT.setName("UCT Thread - " + this.monContact.getPseudo());
