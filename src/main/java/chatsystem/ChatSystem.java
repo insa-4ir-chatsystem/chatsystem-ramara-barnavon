@@ -2,6 +2,7 @@ package chatsystem;
 
 import chatsystem.ContactDiscoveryLib.Contact;
 import chatsystem.ContactDiscoveryLib.ContactsManager;
+import chatsystem.exceptions.PseudoRejectedException;
 import chatsystem.model.DatagramManager;
 import chatsystem.network.UDP_Client;
 import chatsystem.network.UDP_Server;
@@ -63,6 +64,7 @@ public class ChatSystem { //instance de chat sur une machine
         return port;
     }
 
+
     public ContactsManager getCm() {
         return cm;
     }
@@ -77,8 +79,7 @@ public class ChatSystem { //instance de chat sur une machine
 
     /** Starts an instance of ChatSystem */
 
-    public synchronized void start(String pseudoAsked){
-        LOGGER.info("Lancement du chatsystem : " + pseudoAsked);
+    public synchronized void start(){
         startServer();
 
         udpServer.addObserver((received, port) -> {
@@ -159,24 +160,7 @@ public class ChatSystem { //instance de chat sur une machine
         while(id == -1){
             ;
         }
-        String pseudo = choosePseudo(pseudoAsked);
-        if (pseudoAccepted) {
-            this.monContact = new Contact(pseudo, id);
-            UCT.setName("UCT Thread - " + this.monContact.getPseudo());
-            cm.setMonContact(this.monContact);
-            LOGGER.debug("Chatsystem " + monContact.getPseudo() + " started correctly");
-        }else{
-            closeChat();
-            LOGGER.debug("Chatsystem not started");
-        }
-        //System.out.println("Creation contact : " + this.monContact);
-        /*
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        */
+        monContact.setId(id);
 
     }
     public void initServer(String addr, int port) throws SocketException, UnknownHostException {
@@ -215,7 +199,7 @@ public class ChatSystem { //instance de chat sur une machine
         
     }
 
-    private synchronized String choosePseudo(String pseudo){
+    public synchronized void choosePseudo (String pseudo) throws PseudoRejectedException {
         pseudoAccepted = true;
         for(int p : Main.portList){ // TODO: Changer ce mécanisme dégueulasse quand on passera au cas réel sur des IPs
             if(p == this.port) continue;
@@ -230,14 +214,11 @@ public class ChatSystem { //instance de chat sur une machine
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        if(!pseudoAccepted){
-            LOGGER.error("Pseudo " + pseudo + " non disponible, fermeture du chat ----------------------- ");
-            closeChat(); // Fermeture du chat, solution temporaire
-        } else {
-            LOGGER.info("Pseudo accepté et unique: " + pseudo +"------------------------------------------");
+        if(!pseudoAccepted) {
+            throw new PseudoRejectedException(pseudo);
         }
+        monContact.setPseudo(pseudo);
 
-        return pseudo;
     }
     protected synchronized void changePseudo(String pseudo){
         cgmPseudoAccepted = true;
@@ -295,7 +276,7 @@ public class ChatSystem { //instance de chat sur une machine
     }
 
     public void closeChat(){
-        LOGGER.trace("Tentative d'interruption du thread de listening de " + monContact.getPseudo());
+        LOGGER.trace("Tentative d'interruption du serveur UDP :  " + monContact.getPseudo());
         stopServer();
         if (UCT != null){
             LOGGER.trace("Tentative d'interruption du Thread d'update de " + monContact.getPseudo());
@@ -303,8 +284,12 @@ public class ChatSystem { //instance de chat sur une machine
         }
     }
 
-    public boolean isOpen(){
+    public boolean isStarted(){
         return udpServer.isAlive();
+    }
+
+    public UpdateContactsThread getUCT() {
+        return UCT;
     }
 
 

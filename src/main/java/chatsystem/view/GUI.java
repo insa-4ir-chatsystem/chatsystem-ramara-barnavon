@@ -1,8 +1,9 @@
 package chatsystem.view;
 
 
+import chatsystem.ChatSystem;
 import chatsystem.ContactDiscoveryLib.Contact;
-import chatsystem.ContactDiscoveryLib.ContactsManager;
+import chatsystem.exceptions.PseudoRejectedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,14 +12,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import javax.swing.*;
 
 public class GUI {
 
     private static final Logger LOGGER = LogManager.getLogger(GUI.class);
-    private static void createAndShowGUI() {
+    private final ChatSystem CS;
+
+    public GUI(ChatSystem cs) {
+        this.CS = cs;
+    }
+
+    private void createAndShowGUI() {
 
         //final int[] UID = {-1};
 
@@ -34,7 +39,8 @@ public class GUI {
         JPanel Login = MainVM.createPanelView(); // First page to be displayed to choose a pseudo
         JPanel Chatting = MainVM.createPanelView(); // Page to chat with contacts
 
-        Login.setLayout(new BoxLayout(Login, BoxLayout.PAGE_AXIS));
+        //Login.setLayout(new BoxLayout(Login, BoxLayout.PAGE_AXIS));
+        Login.setLayout(new BoxLayout(Login, BoxLayout.Y_AXIS));
         Chatting.setLayout(new BorderLayout());
 
 
@@ -52,15 +58,29 @@ public class GUI {
         /** ---------------------- Logging in page ------------------------ */
 
         JLabel loginTitle = new JLabel("Welcome to Clavard'App\n Please choose your pseudo ", JLabel.CENTER);
+        loginTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         JLabel loginInfo = new JLabel("");
-        JTextField pseudoField1 = new JTextField();
-        JButton buttonStartChatting= new JButton("Start chatting");
-        // buttonStartChatting.addActionListener(choosePseudo);
+        loginInfo.setForeground(Color.RED);
+
+        JPanel pseudoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JTextField pseudoField1 = new JTextField(30);
+
+        pseudoPanel.add(pseudoField1);
+        pseudoField1.setPreferredSize(new Dimension(100, 30));
+        JButton buttonStartChatting = new JButton("Start chatting");
+
+
 
         Login.add(loginTitle);
-        Login.add(pseudoField1);
-        Login.add(buttonStartChatting);
+        Login.add(pseudoPanel);
         Login.add(loginInfo);
+        Login.add(buttonStartChatting);
+
+        /*
+        Login.add(loginTitle, BorderLayout.NORTH);
+        Login.add(pseudoPanel, BorderLayout.CENTER);
+        Login.add(buttonStartChatting, BorderLayout.SOUTH);
+        */
 
         /** ---------------------- Chatting page ------------------------ */
 
@@ -77,7 +97,8 @@ public class GUI {
         // Add components to the contact list panel
         JScrollPane contactScrollPane = new JScrollPane(contactListInnerPanel);
 
-        contactListPanel.add(new JLabel("Contact List"), BorderLayout.NORTH);
+        JLabel contactListTitle = new JLabel();
+        contactListPanel.add(contactListTitle, BorderLayout.NORTH);
         contactListPanel.add(contactScrollPane, BorderLayout.CENTER);
 
         ContactItem itemTest = new ContactItem(new Contact("pseudoTest", 12));
@@ -118,19 +139,50 @@ public class GUI {
         Chatting.add(splitPane, BorderLayout.CENTER);
         Chatting.add(inputPanel, BorderLayout.SOUTH);
         Chatting.setVisible(true);
+        Login.setVisible(true);
 
-        frame.add(Chatting);
+        frame.add(Login);
         frame.setSize(1400, 600);
         frame.setVisible(true);
 
         //MainVM.setViewOfFrame(frame, Sign)
+
+        /** ======================    Action Listeners Implementation    ================================ */
+
+
+        buttonStartChatting.addActionListener(e -> {
+            String askedPseudo = pseudoField1.getText();
+            try {
+                if(!askedPseudo.isEmpty()){
+                    CS.choosePseudo(askedPseudo);
+                    CS.getMonContact().setPseudo(askedPseudo);
+                    CS.getUCT().setName("UCT Thread - " + askedPseudo);
+                    CS.getCm().setMonContact(CS.getMonContact());
+                    LOGGER.trace("Chatsystem " + askedPseudo + " started correctly");
+                    contactListTitle.setText("Connected as " + CS.getMonContact().getPseudo());
+                    MainVM.setViewOfFrame(frame, Chatting);
+                    //TODO: switch view
+                }else{
+                    loginInfo.setText("Please enter a pseudo");
+                }
+            } catch (PseudoRejectedException ex){
+                loginInfo.setText("Someone already have this pseudo, please choose another one");
+                pseudoField1.setText("");
+            }
+
+        });
+
+
+
     }
 
 
-    public static void start() {
+    public void start() {
+        this.CS.start();
 
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+
                 createAndShowGUI();
                 LOGGER.info("Showing gui");
             }

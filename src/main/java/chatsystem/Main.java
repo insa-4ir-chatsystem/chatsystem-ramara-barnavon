@@ -6,7 +6,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
-import java.lang.module.Configuration;
 import java.util.ArrayList;
 //TODO : adapter les LOGGER INFO pour éviter un surchargement
 public class Main {
@@ -23,8 +22,6 @@ public class Main {
         int portZ = 2025;
         int portM = 1789;
         int portDouble = 2026;
-        GUI gui = new GUI();
-        gui.start();
         //TODO: JIRA
 
         portList = new ArrayList<Integer>();
@@ -40,10 +37,15 @@ public class Main {
         ChatSystem ChatK = new ChatSystem(ip, portK);
         ChatSystem ChatDouble = new ChatSystem(ip, portDouble);
 
+
+
+        GUI gui = new GUI(ChatJ);
+        gui.start();
+
         LOGGER.info("Début de la démonstration");
 
-        ChatJ.start("juju");
-        ChatM.start("matis");
+        ChatJ.start();
+        ChatM.start();
         //ChatZ.start("zorro");
         //ChatK.start("matos");
 

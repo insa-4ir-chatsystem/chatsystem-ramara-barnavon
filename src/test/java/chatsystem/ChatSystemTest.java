@@ -2,7 +2,7 @@ package chatsystem;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import chatsystem.ContactDiscoveryLib.Contact;
+import chatsystem.exceptions.PseudoRejectedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
@@ -66,9 +66,13 @@ public class ChatSystemTest {
 
     @Test
     public void testChooseID() {
-        chatSystem1.start("chat1");
-        chatSystem2.start("chat2");
-        chatSystem3.start("chat3");
+        chatSystem1.start();
+        chatSystem2.start();
+        chatSystem3.start();
+
+        LOGGER.debug("chat1 id : " + chatSystem1.getMonContact().getId());
+        LOGGER.debug("chat2 id : " + chatSystem2.getMonContact().getId());
+        LOGGER.debug("chat3 id : " + chatSystem3.getMonContact().getId());
 
         assertNotEquals(chatSystem1.getMonContact().getId(), chatSystem2.getMonContact().getId());
         assertNotEquals(chatSystem3.getMonContact().getId(), chatSystem2.getMonContact().getId());
@@ -77,12 +81,10 @@ public class ChatSystemTest {
 
     @Test
     public void testChoosePseudo() {
-        chatSystem1.start("chat1");
-        chatSystem2.start("chat2");
-        chatSystem3.start("chat2"); // same pseudo as chatSystem2, should fail
+        chatSystem1.start();
+        chatSystem2.start();
+        chatSystem3.start();
 
-
-        //chatSystem3.start("chat2");
         //Stabilisation du système avant les tests
         try {
             Thread.sleep(1000);
@@ -91,16 +93,26 @@ public class ChatSystemTest {
         }
 
         //Passed
+        assertDoesNotThrow(() -> chatSystem1.choosePseudo("chat1"));
+        assertDoesNotThrow(() -> chatSystem2.choosePseudo("chat2"));
         assertEquals("chat1", chatSystem1.getMonContact().getPseudo());
         assertEquals("chat2", chatSystem2.getMonContact().getPseudo());
-        assertFalse(chatSystem3.isOpen());
+        assertThrows(PseudoRejectedException.class, () -> chatSystem3.choosePseudo("chat2")); // same pseudo as chatSystem2, should fail
     }
 
     @Test
     public void testContactGathering() {
-        chatSystem1.start("chat1");
-        chatSystem2.start("chat2");
-        chatSystem3.start("chat3");
+        chatSystem1.start();
+        chatSystem2.start();
+        chatSystem3.start();
+
+        try{
+            chatSystem1.choosePseudo("chat1");
+            chatSystem2.choosePseudo("chat2");
+            chatSystem3.choosePseudo("chat3");
+        } catch (PseudoRejectedException ex){
+            fail(ex.getMessage());
+        }
 
         try {
             Thread.sleep(5000);
@@ -134,9 +146,12 @@ public class ChatSystemTest {
     }
     @Test
     public void testChangePseudo() {
-        chatSystem1.start("chat1");
-        chatSystem2.start("chat2");
-        chatSystem3.start("chat3");
+        chatSystem1.start();
+        try{
+            chatSystem1.choosePseudo("chat1");
+        } catch (PseudoRejectedException ex){
+            fail(ex.getMessage());
+        }
 
         try {
             Thread.sleep(1000);
