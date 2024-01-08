@@ -27,9 +27,9 @@ public class ChatSystemTest {
     @BeforeEach
     public void setUp() {
         // Initialisation d'instances de ChatSystem avec des valeurs de test
-        chatSystem1 = new ChatSystem("127.0.0.1", 8080);
-        chatSystem2 = new ChatSystem("127.0.0.1", 8081);
-        chatSystem3 = new ChatSystem("127.0.0.1", 8082);
+        chatSystem1 = new ChatSystem();
+        chatSystem2 = new ChatSystem();
+        chatSystem3 = new ChatSystem();
         /*
         chatSystem4 = new ChatSystem("127.0.0.1", 8083);
         chatSystem5 = new ChatSystem("127.0.0.1", 8084);

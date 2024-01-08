@@ -23,7 +23,7 @@ public class Main {
         int portZ = 2025;
         int portM = 1789;
         int portDouble = 2026;
-        
+
 
         portList = new ArrayList<Integer>();
         portList.add(portK);
@@ -32,7 +32,7 @@ public class Main {
         portList.add(portM);
         portList.add(portDouble);
 
-        ChatSystem ChatJ = new ChatSystem(ip, portJ);
+        ChatSystem ChatJ = new ChatSystem();
         //ChatSystem ChatM = new ChatSystem(ip, portM);
         //ChatSystem ChatZ = new ChatSystem(ip, portZ);
         //ChatSystem ChatK = new ChatSystem(ip, portK);

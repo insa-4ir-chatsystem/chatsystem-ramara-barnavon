@@ -41,7 +41,7 @@ public class ChatSystem { //instance de chat sur une machine
 
 
     /** Constructor */
-    public ChatSystem(String ip, int portUDP){ //TODO: int portTCP;
+    public ChatSystem(){ //TODO: int portTCP;
         this.cm = new ContactsManager();
         this.monContact = new Contact();
         cm.setMonContact(this.monContact);
@@ -50,7 +50,7 @@ public class ChatSystem { //instance de chat sur une machine
         try {
             setAddresses();
             LOGGER.info("Adresse IP locale : " + this.ip);
-            initServerUDP(this.ip, portUDP);
+            initServerUDP(this.ip, this.portUDP);
             //initServerTCP(port);
         } catch (Exception e) { // impossible to recover from this exception
             LOGGER.error("Unable to create UDP_Server with ip: " + ip + " and port: " + portUDP + "(" + e + ")");
