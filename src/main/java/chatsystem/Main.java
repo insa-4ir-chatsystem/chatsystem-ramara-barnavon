@@ -23,7 +23,7 @@ public class Main {
         int portZ = 2025;
         int portM = 1789;
         int portDouble = 2026;
-        //TODO: JIRA
+        
 
         portList = new ArrayList<Integer>();
         portList.add(portK);
@@ -59,7 +59,7 @@ public class Main {
         //ChatM.closeChat();
         LOGGER.info("[TEST] Vérification de l'unicité du pseudo");
         //ChatDouble.start("juju");
-       
+
 
     }
 }

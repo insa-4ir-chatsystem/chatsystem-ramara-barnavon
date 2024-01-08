@@ -22,7 +22,7 @@ public class UDP_Client {
         byte[] buff = message.getBytes();
         DatagramPacket packet = new DatagramPacket(buff, buff.length, addr, port);
         socket.send(packet);
-        LOGGER.info("Packet sent : " + message + " to port " + port);
+        LOGGER.trace("Packet sent : " + message + " to address " + addr );
         socket.close();
     }
 
