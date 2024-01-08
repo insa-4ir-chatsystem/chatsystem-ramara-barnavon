@@ -5,6 +5,7 @@ import java.util.Objects;
 public class Contact {
     private String pseudo;
     private int id;
+
     /** time to live before removing from Contact list */
     private int TTL;
     private boolean online;
