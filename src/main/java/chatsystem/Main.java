@@ -59,13 +59,7 @@ public class Main {
         //ChatM.closeChat();
         LOGGER.info("[TEST] Vérification de l'unicité du pseudo");
         //ChatDouble.start("juju");
-        try {
-            ChatJ.closeChat();
-            //ChatM.closeChat();
-        } catch (IOException e){
-            LOGGER.trace("Problème lors des close socket");
-            throw new RuntimeException(e);
-        }
+       
 
     }
 }
