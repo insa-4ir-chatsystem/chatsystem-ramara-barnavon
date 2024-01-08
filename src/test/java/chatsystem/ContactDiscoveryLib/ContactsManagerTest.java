@@ -22,10 +22,10 @@ public class ContactsManagerTest {
         testContact2 = new Contact("test2", 2);
     }
 
+
     @Test
     public void testUpdateContact() {
-        setUp();
-
+        //setUp(); // TODO:
 
         // Test de mise à jour du TTL d'un contact existant
         testContact.setTTL(3);

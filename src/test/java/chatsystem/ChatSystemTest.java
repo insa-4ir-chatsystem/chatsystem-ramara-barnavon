@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -50,10 +51,16 @@ public class ChatSystemTest {
     }
 
     @AfterEach
-    public void reset(){
-        chatSystem1.closeChat();
-        chatSystem2.closeChat();
-        chatSystem3.closeChat();
+    public void reset()  {
+
+        try {
+            chatSystem1.closeChat();
+            chatSystem2.closeChat();
+            chatSystem3.closeChat();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         /*
         chatSystem4.closeChat();
         chatSystem5.closeChat();
@@ -146,8 +153,14 @@ public class ChatSystemTest {
 
         /** On veut aussi vérifier que le pseudo de base n'existe plus */
         assertTrue(chatSystem2.getCm().searchContactByPseudo(old_pseudo) == null);
-        chatSystem3.closeChat();
+
+        try {
+            chatSystem3.closeChat();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
+
     @Test
     public void testChangePseudo() {
         chatSystem1.start();

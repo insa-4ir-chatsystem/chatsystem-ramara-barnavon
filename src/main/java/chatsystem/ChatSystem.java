@@ -4,6 +4,7 @@ import chatsystem.ContactDiscoveryLib.Contact;
 import chatsystem.ContactDiscoveryLib.ContactsManager;
 import chatsystem.exceptions.PseudoRejectedException;
 import chatsystem.model.DatagramManager;
+import chatsystem.network.TCP_Server;
 import chatsystem.network.UDP_Client;
 import chatsystem.network.UDP_Server;
 import org.apache.logging.log4j.LogManager;
@@ -25,14 +26,13 @@ public class ChatSystem { //instance de chat sur une machine
     private ContactsManager cm;
     private Contact monContact;
     private UpdateContactsThread UCT;
-    private DataOutputStream out;
-    private DataInputStream in;
     private String ip;
     private int port;
     private boolean pseudoAccepted;
     private boolean cgmPseudoAccepted;
     private boolean IDAccepted;
     private UDP_Server udpServer;
+    private TCP_Server tcpServer;
     private InetAddress broadcastAddress;
 
     private static final Logger LOGGER = LogManager.getLogger(ChatSystem.class);
@@ -47,9 +47,9 @@ public class ChatSystem { //instance de chat sur une machine
         this.ip = ip;
         try {
             this.broadcastAddress = InetAddress.getByName("localhost"); // TODO: Solution temporaire à changer
-            initServer(ip, port);
+            initServerUDP(ip, port);
         } catch (Exception e) { // impossible to recover from this exception
-            LOGGER.error("Unable to create UDP_Server with ip: " + ip + " and port: " + port);
+            LOGGER.error("Unable to create UDP_Server with ip: " + ip + " and port: " + port + "(" + e + ")");
             System.exit(1);
         }
         LOGGER.info("Chatsystem Created");
@@ -80,7 +80,8 @@ public class ChatSystem { //instance de chat sur une machine
     /** Starts an instance of ChatSystem */
 
     public synchronized void start(){
-        startServer();
+        startServerUDP();
+
 
         udpServer.addObserver((received, port) -> {
             try {
@@ -163,9 +164,13 @@ public class ChatSystem { //instance de chat sur une machine
         monContact.setId(id);
 
     }
-    public void initServer(String addr, int port) throws SocketException, UnknownHostException {
+    public void initServerUDP(String addr, int port) throws SocketException, UnknownHostException {
         this.udpServer = new UDP_Server(port, addr);
         LOGGER.trace("Local UDP server initialized");
+    }
+    public void initServerTCP(int port) throws SocketException, UnknownHostException, IOException {
+        this.tcpServer = new TCP_Server(port);
+        LOGGER.trace("Local TCP server initialized");
     }
     private int chooseID(){
         IDAccepted = false;
@@ -248,17 +253,24 @@ public class ChatSystem { //instance de chat sur une machine
 
 
     }
+    /**public synchronized void start*/
 
 
 
 
-    public void startServer(){
+    public void startServerUDP(){
         LOGGER.trace("Lancement du Serveur UDP");
         udpServer.start();
     }
+    public void startServerTCP(){
+        LOGGER.trace("Lancement du Serveur TCP");
+        tcpServer.start();
+    }
 
-    public void stopServer(){
+    public void stopServer() throws IOException{
+
         udpServer.close();
+        /**tcpServer.close();*/
     }
 
     public void startUpdateContacts(){
@@ -275,7 +287,7 @@ public class ChatSystem { //instance de chat sur une machine
         //System.out.println("]");
     }
 
-    public void closeChat(){
+    public void closeChat() throws IOException{
         LOGGER.trace("Tentative d'interruption du serveur UDP :  " + monContact.getPseudo());
         stopServer();
         if (UCT != null){

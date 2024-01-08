@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
+import java.io.IOException;
 import java.util.ArrayList;
 //TODO : adapter les LOGGER INFO pour éviter un surchargement
 public class Main {
@@ -14,7 +15,7 @@ public class Main {
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
     public static void main(String[] args) {
         //TODO: push les diagrammes uml sur le depot
-        Configurator.setRootLevel(Level.OFF);
+        Configurator.setRootLevel(Level.DEBUG);
         //Liste des ports qu'on prévoit en avance d'utiliser
         String ip = "localhost";
         int portJ = 2023;
@@ -44,8 +45,7 @@ public class Main {
 
         LOGGER.info("Début de la démonstration");
 
-        ChatJ.start();
-        ChatM.start();
+
         //ChatZ.start("zorro");
         //ChatK.start("matos");
 
@@ -59,8 +59,13 @@ public class Main {
         //ChatM.closeChat();
         LOGGER.info("[TEST] Vérification de l'unicité du pseudo");
         //ChatDouble.start("juju");
-        ChatJ.closeChat();
-        ChatM.closeChat();
+        try {
+            ChatJ.closeChat();
+            ChatM.closeChat();
+        } catch (IOException e){
+            LOGGER.trace("Problème lors des close socket");
+            throw new RuntimeException(e);
+        }
 
     }
 }
