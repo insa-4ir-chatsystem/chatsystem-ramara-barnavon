@@ -33,10 +33,10 @@ public class Main {
         portList.add(portDouble);
 
         ChatSystem ChatJ = new ChatSystem(ip, portJ);
-        ChatSystem ChatM = new ChatSystem(ip, portM);
-        ChatSystem ChatZ = new ChatSystem(ip, portZ);
-        ChatSystem ChatK = new ChatSystem(ip, portK);
-        ChatSystem ChatDouble = new ChatSystem(ip, portDouble);
+        //ChatSystem ChatM = new ChatSystem(ip, portM);
+        //ChatSystem ChatZ = new ChatSystem(ip, portZ);
+        //ChatSystem ChatK = new ChatSystem(ip, portK);
+        //ChatSystem ChatDouble = new ChatSystem(ip, portDouble);
 
 
 
@@ -61,7 +61,7 @@ public class Main {
         //ChatDouble.start("juju");
         try {
             ChatJ.closeChat();
-            ChatM.closeChat();
+            //ChatM.closeChat();
         } catch (IOException e){
             LOGGER.trace("Problème lors des close socket");
             throw new RuntimeException(e);
