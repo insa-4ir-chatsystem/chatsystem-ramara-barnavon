@@ -48,10 +48,8 @@ public class ChatSystem { //instance de chat sur une machine
         this.portUDP = PORT_UDP;
         this.portTCP = PORT_TCP;
         try {
-            ip = InetAddress.getLocalHost().getHostAddress();
-            this.ip = ip;
-            LOGGER.info("Adresse IP locale : " + ip);
-            setBroadcastAddress();
+            setAddresses();
+            LOGGER.info("Adresse IP locale : " + this.ip);
             initServerUDP(ip, portUDP);
             //initServerTCP(port);
         } catch (Exception e) { // impossible to recover from this exception
@@ -78,23 +76,43 @@ public class ChatSystem { //instance de chat sur une machine
     }
 
     /** gets the broadcast address of the first network interface and assigns it to the attribute */
-    public void setBroadcastAddress() throws SocketException{
-        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-        while (interfaces.hasMoreElements())
-        {
-            NetworkInterface networkInterface = interfaces.nextElement();
-            if (networkInterface.isLoopback())
-                continue;    // Do not want to use the loopback interface.
-            for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses())
-            {
-                this.broadcastAddress = interfaceAddress.getBroadcast();
-                if (this.broadcastAddress == null){
-                    throw new SocketException("No broadcast address ");
-                }
+    public void setAddresses() throws SocketException{
+        try {
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+            while (networkInterfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = networkInterfaces.nextElement();
 
+                // Vérifie si l'interface n'est pas de type bouclage et si elle est activée
+                if (!networkInterface.isLoopback() && networkInterface.isUp()) {
+                    Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+                    while (inetAddresses.hasMoreElements()) {
+                        InetAddress inetAddress = inetAddresses.nextElement();
+
+                        // Vérifie si c'est une adresse IPv4 et non une adresse loopback
+                        if (inetAddress instanceof java.net.Inet4Address && !inetAddress.isLoopbackAddress()) {
+                            System.out.println("Adresse IPv4 de la première interface réseau : " + inetAddress.getHostAddress());
+
+                            // Obtient l'adresse de broadcast associée à l'interface
+                            for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
+                                this.ip = interfaceAddress.getAddress().getHostAddress();
+                                this.broadcastAddress = interfaceAddress.getBroadcast();
+                                InetAddress broadcastAddress = interfaceAddress.getBroadcast();
+                                if (broadcastAddress != null) {
+                                    System.out.println("Adresse de broadcast : " + broadcastAddress.getHostAddress());
+                                }
+                            }
+
+                            return; // Arrête l'exécution après avoir trouvé la première adresse IPv4
+                        }
+                    }
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
+
+
     public void setMonContact(String pseudo, int id) {
         this.monContact.setPseudo(pseudo);
         this.monContact.setId(id);

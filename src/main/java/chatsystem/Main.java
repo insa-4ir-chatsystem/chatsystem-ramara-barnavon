@@ -50,7 +50,7 @@ public class Main {
         //ChatK.start("matos");
 
         try {
-            Thread.sleep(000);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
