@@ -50,7 +50,7 @@ public class ChatSystem { //instance de chat sur une machine
         try {
             setAddresses();
             LOGGER.info("Adresse IP locale : " + this.ip);
-            initServerUDP(this.ip, this.portUDP);
+            initServerUDP(this.broadcastAddress.getHostAddress(), this.portUDP);
             //initServerTCP(port);
         } catch (Exception e) { // impossible to recover from this exception
             LOGGER.error("Unable to create UDP_Server with ip: " + ip + " and port: " + portUDP + "(" + e + ")");
@@ -209,7 +209,7 @@ public class ChatSystem { //instance de chat sur une machine
     }
     public void initServerUDP(String addr, int port) throws SocketException, UnknownHostException {
         this.udpServer = new UDP_Server(port, addr);
-        LOGGER.trace("Local UDP server initialized");
+        LOGGER.trace("Local UDP server initialized at address " + addr + " on port " + port);
     }
     public void initServerTCP(int port) throws SocketException, UnknownHostException, IOException {
         this.tcpServer = new TCP_Server(port);
