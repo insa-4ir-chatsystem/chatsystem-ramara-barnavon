@@ -59,7 +59,7 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
         }
     }
 
-    public synchronized Contact searchContactByID(int id){//TODO:Il faut que l'argument soit un id et pas un contact
+    public synchronized Contact searchContactByID(int id){
         for(Contact c : this.contactList){
             if (c.getId() == (id)){
                 return c;

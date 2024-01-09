@@ -44,7 +44,6 @@ public class GUI {
         JPanel Login = MainVM.createPanelView(); // First page to be displayed to choose a pseudo
         JPanel Chatting = MainVM.createPanelView(); // Page to chat with contacts
 
-        //Login.setLayout(new BoxLayout(Login, BoxLayout.PAGE_AXIS));
         Login.setLayout(new BoxLayout(Login, BoxLayout.Y_AXIS));
         Chatting.setLayout(new BorderLayout());
 
@@ -106,6 +105,7 @@ public class GUI {
         contactListPanel.add(contactListTitle, BorderLayout.NORTH);
         contactListPanel.add(contactScrollPane, BorderLayout.CENTER);
 
+        /** fake contacts for testing purposes */
         ContactItem itemTest = new ContactItem(new Contact("pseudoTest", 12));
         contactListInnerPanel.add(itemTest);
         ContactItem itemTest2 = new ContactItem(new Contact("pseudoTest2", 2));
@@ -146,10 +146,13 @@ public class GUI {
         Chatting.add(chattingTitle, BorderLayout.NORTH);
         Chatting.add(splitPane, BorderLayout.CENTER);
         Chatting.add(inputPanel, BorderLayout.SOUTH);
-        Chatting.setVisible(true);
-        Login.setVisible(true);
 
-        frame.add(Login);
+        //Chatting.setVisible(true);
+        //Login.setVisible(true);
+
+        MainVM.setViewOfFrame(frame, Login);
+
+        //frame.add(Login);
         frame.setSize(1400, 600);
         frame.setVisible(true);
 
@@ -157,6 +160,7 @@ public class GUI {
 
         /** ======================    Action Listeners Implementation    ================================ */
 
+        /** button to choose pseudo and start chatting */
 
         buttonStartChatting.addActionListener(e -> {
             String askedPseudo = pseudoField1.getText();
@@ -179,6 +183,7 @@ public class GUI {
 
         });
 
+        /** button to change pseudo */
         changePseudoButton.addActionListener(e -> {
             String askedPseudo = pseudoFieldd.getText();
             try {
@@ -215,6 +220,10 @@ public class GUI {
 
                 createAndShowGUI();
                 LOGGER.info("Showing gui");
+                // TODO:
+                //  Boucle d'update de tous les composants graphiques ?
+                //  Ex : si un contact n'est plus en ligne, changer sa pastille
+
             }
         });
 
@@ -263,7 +272,7 @@ public class GUI {
     public static class ContactItem extends JPanel{
         JLabel pseudo;
         JLabel onlineMark;
-        JPanel chat;
+        JPanel chat; // corresponding chat view
         Contact contact;
 
         public ContactItem(Contact contact){
@@ -281,6 +290,7 @@ public class GUI {
             onlineMark.setOpaque(true);
             onlineMark.setPreferredSize(new Dimension(10, 10));
             setOnline();
+            setBackground(Color.WHITE);
 
             this.add(pseudo);
             this.add(onlineMark);
@@ -290,7 +300,33 @@ public class GUI {
                 public void mouseClicked(MouseEvent e) {
 
                 }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    super.mouseEntered(e);
+                    setBackground(Color.LIGHT_GRAY);
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    super.mouseExited(e);
+                    setBackground(Color.WHITE);
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    super.mousePressed(e);
+                    setBackground(Color.DARK_GRAY);
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    super.mouseReleased(e);
+                    setBackground(Color.WHITE);
+                }
             });
+
+
         }
         
         public JPanel getChat(){

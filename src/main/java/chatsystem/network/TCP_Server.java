@@ -34,7 +34,7 @@ public class TCP_Server extends Thread {
         while(!this.isInterrupted()) {
 
             try {
-                clientSocket = serverSocket.accept();
+                clientSocket = serverSocket.accept(); // TODO: créer un thread pour toutes les connections entrantes
 
                 out = new PrintWriter(clientSocket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));

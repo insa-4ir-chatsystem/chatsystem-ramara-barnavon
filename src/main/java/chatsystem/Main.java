@@ -8,7 +8,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 
 import java.io.IOException;
 import java.util.ArrayList;
-//TODO : adapter les LOGGER INFO pour éviter un surchargement
+//TODO : comprendre pourquoi en réseau on capte pas les refus et fixé l'auto answer
 public class Main {
 
     public static ArrayList<Integer> portList;

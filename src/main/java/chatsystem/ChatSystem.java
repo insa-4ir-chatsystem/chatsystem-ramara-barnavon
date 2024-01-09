@@ -40,6 +40,8 @@ public class ChatSystem { //instance de chat sur une machine
     private final int PORT_TCP = 42070;
 
 
+    //TODO : Voir TODO main :)
+
     /** Constructor */
     public ChatSystem(){ //TODO: int portTCP;
         this.cm = new ContactsManager();
