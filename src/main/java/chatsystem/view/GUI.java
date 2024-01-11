@@ -3,6 +3,7 @@ package chatsystem.view;
 
 import chatsystem.ChatSystem;
 import chatsystem.ContactDiscoveryLib.Contact;
+import chatsystem.database.ChatHistoryManager;
 import chatsystem.exceptions.PseudoRejectedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -214,7 +215,6 @@ public class GUI {
 
     public void start() {
         this.CS.start();
-
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
 

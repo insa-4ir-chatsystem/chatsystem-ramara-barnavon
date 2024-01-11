@@ -4,10 +4,12 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public class ChatHistoryManager {// TODO : bien gérer les exceptions
-    private static final String DB_URL = "jdbc:sqlite:./history/chat_history.db";
+/** This class is used to manage the DB containing all the messages */
+public class ChatHistoryManager {
+    private static final String DB_URL = "jdbc:sqlite:history/chat_history.db";
 
-    public void createChatHistoryTable() {
+    /** Creates a Table to store all the messages */
+    public void createChatHistoryTable() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS chat_history (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "sender INT," +
@@ -18,22 +20,20 @@ public class ChatHistoryManager {// TODO : bien gérer les exceptions
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
         }
     }
 
-    public void deleteChatHistoryTable(){
+    /** Deletes the Table containing the messages */
+    public void deleteChatHistoryTable() throws SQLException {
         String sql = "DROP TABLE IF EXISTS chat_history";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
         }
     }
 
-    public void insertMessage(int sender, String message) {
+    /** Inserts a message in the table with the sender ID */
+    public void insertMessage(int sender, String message) throws SQLException {
         String sql = "INSERT INTO chat_history(sender, message) VALUES(?, ?)";
 
         try (Connection conn = DriverManager.getConnection(DB_URL);
@@ -41,19 +41,18 @@ public class ChatHistoryManager {// TODO : bien gérer les exceptions
             query.setInt(1, sender);
             query.setString(2, message);
             query.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
         }
     }
 
-    public ArrayList<ChatMessage> getHistoryOf(int sender) {
-        String sql = "SELECT * FROM chat_history WHERE id = ?";
+    /** Gets all the messages sent from a contact by its ID */
+    public ArrayList<ChatMessage> getHistoryOf(int sender) throws SQLException {
+        String sql = "SELECT * FROM chat_history WHERE sender = ?";
         ArrayList<ChatMessage> Qresult = new ArrayList<>();
 
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement query = conn.prepareStatement(sql)) {
             query.setInt(1, sender);
-            ResultSet resultSet = query.executeQuery(sql);
+            ResultSet resultSet = query.executeQuery();
             while (resultSet.next()) {
                 int Mid = resultSet.getInt("id");
                 int senderId = resultSet.getInt("sender");
@@ -62,8 +61,6 @@ public class ChatHistoryManager {// TODO : bien gérer les exceptions
 
                 Qresult.add(new ChatMessage(Mid, senderId, content, timestamp));
             }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
         }
         return Qresult;
     }
