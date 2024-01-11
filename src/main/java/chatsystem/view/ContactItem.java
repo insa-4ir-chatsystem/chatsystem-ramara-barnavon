@@ -20,6 +20,7 @@ public class ContactItem extends JPanel {
         this.chat = new JPanel(new BorderLayout());
         this.pseudo = new JLabel(this.contact.getPseudo());
         this.onlineMark = new JLabel();
+        setMaximumSize(new Dimension(1000, 20));
 
         this.setUpPanel();
     }

@@ -145,6 +145,7 @@ public class GUI {
         contactInputPanel.add(pseudoFieldd);
         contactInputPanel.add(changePseudoButton);
         contactListPanel.add(contactInputPanel, BorderLayout.SOUTH);
+        contactListPanel.setMinimumSize(new Dimension(450, 400));
 
         // Create a split pane for contact list and chat history
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, contactListPanel, ChatHistory1);
