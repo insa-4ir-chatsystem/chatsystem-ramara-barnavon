@@ -3,7 +3,7 @@ package chatsystem.view;
 
 import chatsystem.ChatSystem;
 import chatsystem.ContactDiscoveryLib.Contact;
-import chatsystem.database.ChatHistoryManager;
+import chatsystem.database.ChatMessage;
 import chatsystem.exceptions.PseudoRejectedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,6 +13,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDateTime;
 import javax.swing.*;
 
 public class GUI {
@@ -115,6 +116,12 @@ public class GUI {
         contactListInnerPanel.add(itemTest3);
         itemTest2.setOffline();
 
+        /** fake ChatHistory for testing purposes */
+        ChatHistory ChatHistory1 = new ChatHistory();
+        ChatHistory1.addMessage(new ChatMessage(0, 1, "message 1", LocalDateTime.now()));
+        ChatHistory1.addMessage(new ChatMessage(1, 0, "message 2", LocalDateTime.now()));
+        ChatHistory1.addMessage(new ChatMessage(1, 0, "messagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessage 2", LocalDateTime.now()));
+
         // Add components to the chat history panel
         JTextArea chatHistory = new JTextArea();
         JScrollPane chatScrollPane = new JScrollPane(chatHistory);
@@ -140,7 +147,7 @@ public class GUI {
         contactListPanel.add(contactInputPanel, BorderLayout.SOUTH);
 
         // Create a split pane for contact list and chat history
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, contactListPanel, EmptyChatHistoryPanel);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, contactListPanel, ChatHistory1);
         //splitPane.setResizeWeight(0.1); // Adjust the divider location
 
         // Add the split pane and input panel to the frame
@@ -197,17 +204,26 @@ public class GUI {
                     pseudoFieldd.setText("");
                     contactListTitle.setText("Connected as " + CS.getMonContact().getPseudo());
                 }else{
-                    infoChangePseudo.setText("Please enter a pseudo"); //TODO: notify somewhere on the screen
+                    infoChangePseudo.setText("Please enter a pseudo");
                 }
             } catch (PseudoRejectedException ex){
                 infoChangePseudo.setText("Pseudo not available");
                 pseudoFieldd.setText("");
             }
 
-
-
         });
 
+        /** Button to send a message to selected contact */
+        sendMessageButton.addActionListener(e -> {
+            String message = messageField.getText();
+            messageField.setText("");
+            if(message.isEmpty()){
+                infoChangePseudo.setText("Please enter a message");
+            }else{
+                ChatHistory1.addMessage(new ChatMessage(99, 99, message, LocalDateTime.now()));
+            }
+            // TODO: get sender id
+        });
 
 
     }
@@ -269,80 +285,8 @@ public class GUI {
 
     }
 
-    public static class ContactItem extends JPanel{
-        JLabel pseudo;
-        JLabel onlineMark;
-        JPanel chat; // corresponding chat view
-        Contact contact;
-
-        public ContactItem(Contact contact){
-            super(new FlowLayout());
-            this.contact = contact;
-            this.chat = new JPanel(new BorderLayout());
-            this.pseudo = new JLabel(this.contact.getPseudo());
-            this.onlineMark = new JLabel();
-            
-            this.setUpPanel();
-        }
-
-        private void setUpPanel(){
-
-            onlineMark.setOpaque(true);
-            onlineMark.setPreferredSize(new Dimension(10, 10));
-            setOnline();
-            setBackground(Color.WHITE);
-
-            this.add(pseudo);
-            this.add(onlineMark);
-
-            addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-
-                }
-
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                    super.mouseEntered(e);
-                    setBackground(Color.LIGHT_GRAY);
-                }
-
-                @Override
-                public void mouseExited(MouseEvent e) {
-                    super.mouseExited(e);
-                    setBackground(Color.WHITE);
-                }
-
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    super.mousePressed(e);
-                    setBackground(Color.DARK_GRAY);
-                }
-
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                    super.mouseReleased(e);
-                    setBackground(Color.WHITE);
-                }
-            });
 
 
-        }
-        
-        public JPanel getChat(){
-            return this.chat;
-        }
-
-        public void setOnline(){
-            onlineMark.setBackground(Color.GREEN);
-        }
-
-        public void setOffline(){
-            onlineMark.setBackground(Color.RED);
-        }
-
-
-    }
 
 
 
