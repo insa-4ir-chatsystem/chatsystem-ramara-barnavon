@@ -3,6 +3,7 @@ package chatsystem.view;
 
 import chatsystem.ChatSystem;
 import chatsystem.ContactDiscoveryLib.Contact;
+import chatsystem.ContactDiscoveryLib.ContactsManager;
 import chatsystem.database.ChatMessage;
 import chatsystem.exceptions.PseudoRejectedException;
 import org.apache.logging.log4j.LogManager;
@@ -14,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import javax.swing.*;
 
 public class GUI {
@@ -110,9 +112,9 @@ public class GUI {
         /** fake contacts for testing purposes */
         ContactItem itemTest = new ContactItem(new Contact("pseudoTest", 12));
         contactListInnerPanel.add(itemTest);
-        ContactItem itemTest2 = new ContactItem(new Contact("pseudoTest2", 2));
+        ContactItem itemTest2 = new ContactItem(new Contact("pseudoTest2", 22));
         contactListInnerPanel.add(itemTest2);
-        ContactItem itemTest3 = new ContactItem(new Contact("pseudoTest2", 2));
+        ContactItem itemTest3 = new ContactItem(new Contact("pseudoTest2", 23));
         contactListInnerPanel.add(itemTest3);
         itemTest2.setOffline();
 
@@ -162,10 +164,43 @@ public class GUI {
         MainVM.setViewOfFrame(frame, Login);
 
         //frame.add(Login);
-        frame.setSize(1400, 600);
+        frame.setSize(600, 600);
         frame.setVisible(true);
 
         //MainVM.setViewOfFrame(frame, Sign)
+
+        /** ======================    Adding observers to ContactManager    =============================== */
+
+        this.CS.getCm().addObserver(new ContactsManager.Observer() {
+            @Override
+            public void addContact(Contact contact) {
+                ContactItem contactItem = new ContactItem(contact);
+                contactListInnerPanel.add(contactItem);
+                contactListInnerPanel.revalidate();
+                contactListInnerPanel.repaint();
+            }
+
+            @Override
+            public void updateContact(Contact contact) {
+                Component[] ContactComponentList = contactListInnerPanel.getComponents();
+                for(Component cc : ContactComponentList){
+                    if (cc instanceof ContactItem){
+                        ContactItem ci = (ContactItem) cc;
+
+                        if(ci.getContact().equals(contact)){
+                            ci.setContact(contact);
+                            ci.updateContactItem();
+                            break;
+                        }
+                    }
+                }
+
+
+                contactListInnerPanel.revalidate();
+                contactListInnerPanel.repaint();
+            }
+        });
+
 
         /** ======================    Action Listeners Implementation    ================================ */
 

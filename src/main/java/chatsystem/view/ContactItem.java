@@ -69,8 +69,25 @@ public class ContactItem extends JPanel {
 
     }
 
+    public void updateContactItem(){
+        pseudo.setText(this.contact.getPseudo());
+        if(this.contact.isOnline()){
+            setOnline();
+        }else{
+            setOffline();
+            System.out.println("C LA MERDEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+        }
+    }
+
     public JPanel getChat(){
         return this.chat;
+    }
+
+    public Contact getContact() {
+        return contact;
+    }
+    public void setContact(Contact contact) {
+        this.contact = contact;
     }
 
     public void setOnline(){
