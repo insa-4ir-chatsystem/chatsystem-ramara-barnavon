@@ -12,8 +12,9 @@ import java.util.List;
 public class UDP_Server extends Thread {
 
     private static final Logger LOGGER = LogManager.getLogger(UDP_Server.class);
-    private final DatagramSocket socket;
+    private DatagramSocket socket;
     private final List<Observer> observers = new ArrayList<>();
+    private final InetAddress ip;
 
     /** Interface that observers of the UDP server must implement. */
     public interface Observer {
@@ -23,9 +24,12 @@ public class UDP_Server extends Thread {
 
 
 
-    public UDP_Server(int port, String ip) throws SocketException, UnknownHostException {
-        socket = new DatagramSocket(port, InetAddress.getByName(ip));
+    public UDP_Server(int port, InetAddress ip) throws SocketException, UnknownHostException {
+        socket = new DatagramSocket(port);
+        socket.setBroadcast(true);
+        this.ip = ip;
     }
+
 
     /** Adds a new observer to the class, for which the handle method will be called for each incoming message. */
     public void addObserver(Observer obs) {
@@ -61,8 +65,14 @@ public class UDP_Server extends Thread {
                 String received = new String(packet.getData(), 0, packet.getLength());
                 UDP_Message message = new UDP_Message(received, packet.getAddress());
                 int port = packet.getPort();
-                LOGGER.trace("Received on port " + socket.getLocalPort() + ": " + message.content() + " from " + message.origin());
 
+                if( message.origin().equals(ip) ){
+                    LOGGER.trace("Packet sent to myself : DROPPING packet");
+                    continue;
+                }
+                if(!(message.content().startsWith("INCO") || message.content().startsWith("DECO"))){
+                    LOGGER.debug("Received on port " + socket.getLocalPort() + ": " + message.content() + " from " + message.origin());
+                }
                 synchronized (this.observers) {
                     for (Observer obs : this.observers) {
                         obs.handle(message, port);

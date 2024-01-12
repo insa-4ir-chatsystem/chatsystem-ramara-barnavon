@@ -1,6 +1,5 @@
 package chatsystem.ContactDiscoveryLib;
 
-import chatsystem.ChatSystem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -79,13 +78,16 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
 
     public synchronized void decreaseTTL() {
         Iterator<Contact> iterator = this.contactList.iterator();
-        LOGGER.info("List of contact to be ttldecreased : " + contactList);
+        //LOGGER.info("List of contact to be ttldecreased : " + contactList);
         while (iterator.hasNext()) { //strange because needed before
             Contact c = iterator.next();
+            if(!c.isOnline()){
+                continue;
+            }
             c.decrementTTL();
             if (c.getTTL() <= 0) {
                 c.setOnline(false);
-                LOGGER.info("{" + c.getPseudo() + "}  TTl expiré, contact retiré : " + c);
+                LOGGER.debug("{" + c.getPseudo() + "}  TTl expiré, contact retiré : " + c);
             }
         }
     }
@@ -94,10 +96,10 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
     public synchronized void afficherListe() {
         if (!contactList.isEmpty()) {
             for (Contact contact : this.contactList) {
-                LOGGER.info("    {" + monContact.getPseudo() + "}    " + contact);
+                LOGGER.debug("    {" + monContact.getPseudo() + "}    " + contact);
             }
         }else {
-            LOGGER.info("Liste de contacts de " + monContact + " est vide");
+            LOGGER.debug("Liste de contacts de " + monContact + " est vide");
         }
     }
 

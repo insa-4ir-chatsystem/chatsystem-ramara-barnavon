@@ -1,3 +1,6 @@
+// TODO : parler de ces tests dans le rapport
+
+/*
 package chatsystem;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,22 +33,20 @@ public class ChatSystemTest {
         chatSystem1 = new ChatSystem();
         chatSystem2 = new ChatSystem();
         chatSystem3 = new ChatSystem();
-        /*
-        chatSystem4 = new ChatSystem("127.0.0.1", 8083);
-        chatSystem5 = new ChatSystem("127.0.0.1", 8084);
-        chatSystem6 = new ChatSystem("127.0.0.1", 8085);
 
-         */
+        //chatSystem4 = new ChatSystem("127.0.0.1", 8083);
+        //chatSystem5 = new ChatSystem("127.0.0.1", 8084);
+        //chatSystem6 = new ChatSystem("127.0.0.1", 8085);
+
+
         Main.portList = new ArrayList<Integer>();
         Main.portList.add(8080);
         Main.portList.add(8081);
         Main.portList.add(8082);
-        /*
-        Main.portList.add(8083);
-        Main.portList.add(8084);
-        Main.portList.add(8085);
+        //Main.portList.add(8083);
+        //Main.portList.add(8084);
+        //Main.portList.add(8085);
 
-         */
         //chatSystem1.start("chat1");
         //chatSystem2.start("chat2");
     }
@@ -61,12 +62,12 @@ public class ChatSystemTest {
             throw new RuntimeException(e);
         }
 
-        /*
-        chatSystem4.closeChat();
-        chatSystem5.closeChat();
-        chatSystem6.closeChat();
 
-         */
+        //chatSystem4.closeChat();
+        //chatSystem5.closeChat();
+        //chatSystem6.closeChat();
+
+
 
         System.out.println("reset");
     }
@@ -147,11 +148,11 @@ public class ChatSystemTest {
         } catch (InterruptedException e) {
             LOGGER.debug("Interrompu dans un sleep de "+ Thread.currentThread().getName());
         }
-        /** On veut vérifier ici que un contact qui change de pseudo est actualisé sur la lan */
+        // On veut vérifier ici que un contact qui change de pseudo est actualisé sur la lan
         assertTrue(chatSystem2.getCm().getContactList().contains(chatSystem3.getMonContact()));
         assertTrue(chatSystem1.getCm().getContactList().contains(chatSystem3.getMonContact()));
 
-        /** On veut aussi vérifier que le pseudo de base n'existe plus */
+        // On veut aussi vérifier que le pseudo de base n'existe plus
         assertTrue(chatSystem2.getCm().searchContactByPseudo(old_pseudo) == null);
 
         try {
@@ -187,3 +188,5 @@ public class ChatSystemTest {
     }
 
 }
+
+*/

@@ -15,7 +15,7 @@ public class Main {
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
     public static void main(String[] args) {
         //TODO: push les diagrammes uml sur le depot
-        Configurator.setRootLevel(Level.DEBUG);
+        Configurator.setRootLevel(Level.ERROR);
         //Liste des ports qu'on prévoit en avance d'utiliser
         String ip = "localhost";
         int portJ = 2023;

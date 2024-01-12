@@ -25,15 +25,16 @@ public class ChatSystem { //instance de chat sur une machine
     private ContactsManager cm;
     private Contact monContact;
     private UpdateContactsThread UCT;
-    private String ip;
     private int portUDP;
     private int portTCP;
     private boolean pseudoAccepted;
     private boolean cgmPseudoAccepted;
     private boolean IDAccepted;
     private UDP_Server udpServer;
+    private UDP_Server udpBroadcastServer;
     private TCP_Server tcpServer;
     private InetAddress broadcastAddress;
+    private InetAddress ip;
 
     private static final Logger LOGGER = LogManager.getLogger(ChatSystem.class);
     private final int PORT_UDP = 42069; // arbitrary ports to use on every machine
@@ -52,7 +53,7 @@ public class ChatSystem { //instance de chat sur une machine
         try {
             setAddresses();
             LOGGER.info("Adresse IP locale : " + this.ip);
-            initServerUDP(this.broadcastAddress.getHostAddress(), this.portUDP);
+            initServerUDP(this.portUDP);
             //initServerTCP(port);
         } catch (Exception e) { // impossible to recover from this exception
             LOGGER.error("Unable to create UDP_Server with ip: " + ip + " and port: " + portUDP + "(" + e + ")");
@@ -96,7 +97,7 @@ public class ChatSystem { //instance de chat sur une machine
 
                             // Obtient l'adresse de broadcast associée à l'interface
                             for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
-                                this.ip = interfaceAddress.getAddress().getHostAddress();
+                                this.ip = interfaceAddress.getAddress();
                                 this.broadcastAddress = interfaceAddress.getBroadcast();
                                 InetAddress broadcastAddress = interfaceAddress.getBroadcast();
                                 if (broadcastAddress != null) {
@@ -141,7 +142,7 @@ public class ChatSystem { //instance de chat sur une machine
 
                         case DECO: //On reçoit une demande de contact, on souhaite renvoyer notre contact au destinaire
                             if ((monContact != null && (monContact.getId() != -1))) {
-                                UDP_Client.send_INCO(received.origin(), this.portUDP, DatagramManager.getPort(msg), monContact);
+                                UDP_Client.send_INCO(received.origin(), DatagramManager.getPort(msg), monContact);
                             }
                             break;
 
@@ -151,9 +152,10 @@ public class ChatSystem { //instance de chat sur une machine
 
                         case DEPS: //
                             String his_pseudo = DatagramManager.XXPSToPseudo(msg);
-
-                            if (cm.searchContactByPseudo(his_pseudo) != null || (monContact != null && his_pseudo == monContact.getPseudo())) { //Si le pseudo existe déjà
-                                UDP_Client.send_REPS(received.origin(), this.portUDP, DatagramManager.getPort(msg));
+                            LOGGER.debug("Mon pseudo est : " + this.monContact.getPseudo() + " pseudo demandé : " + his_pseudo);
+                            if (cm.searchContactByPseudo(his_pseudo) != null || (this.monContact != null && his_pseudo.equals(monContact.getPseudo()))) { //Si le pseudo existe déjà
+                                UDP_Client.send_REPS(received.origin(), DatagramManager.getPort(msg));
+                                LOGGER.debug("Mon pseudo est : " + this.monContact.getPseudo() + " Refus du pseudo " + his_pseudo);
                             } //else on fait rien il ( il supposera que oui tant que personne lui dit non )
 
                             break;
@@ -161,7 +163,7 @@ public class ChatSystem { //instance de chat sur une machine
                         case DEID: //si l'ID existe il refuse avec un id_conseillé ( le max + 1 de sa liste ) si l'ID n'existe pas, il renvoie rien
                             int his_id = DatagramManager.XXIDToId(msg);
                             if (his_id <= cm.getIdMax()) { //Si l'id existe déjà
-                                UDP_Client.send_REID(received.origin(), this.portUDP, DatagramManager.getPort(msg), his_id + 1); //on renvoie refus et on donne l'id conseillé
+                                UDP_Client.send_REID(received.origin(), DatagramManager.getPort(msg), his_id + 1); //on renvoie refus et on donne l'id conseillé
                                 //cm.setIdMax(his_id + 1);
                             } //else on fait rien il ( il supposera que oui tant que personne lui dit non )
                             break;
@@ -174,8 +176,8 @@ public class ChatSystem { //instance de chat sur une machine
                         case CHPS: //
                             String hisNewPseudo = DatagramManager.XXPSToPseudo(msg);
                             Integer hisOldID = DatagramManager.XXPSToID(msg);
-                            if (cm.searchContactByPseudo(hisNewPseudo) != null || (monContact != null && hisNewPseudo == monContact.getPseudo())) { //Si le pseudo existe déjà
-                                UDP_Client.send_RECH(received.origin(), this.portUDP, DatagramManager.getPort(msg));
+                            if (cm.searchContactByPseudo(hisNewPseudo) != null || (monContact != null && hisNewPseudo.equals(monContact.getPseudo()))) { //Si le pseudo existe déjà
+                                UDP_Client.send_RECH(received.origin(), DatagramManager.getPort(msg));
                                 /** ( l'emetteur supposera que c'est bon tant que personne lui refuse son nouveau pseudo )*/
                             }
 
@@ -209,9 +211,9 @@ public class ChatSystem { //instance de chat sur une machine
         monContact.setId(id);
 
     }
-    public void initServerUDP(String addr, int port) throws SocketException, UnknownHostException {
-        this.udpServer = new UDP_Server(port, addr);
-        LOGGER.trace("Local UDP server initialized at address " + addr + " on port " + port);
+    public void initServerUDP(int port) throws SocketException, UnknownHostException {
+        this.udpServer = new UDP_Server(port, this.ip);
+        LOGGER.trace("Local UDP server initialized on port " + port);
     }
     public void initServerTCP(int port) throws SocketException, UnknownHostException, IOException {
         this.tcpServer = new TCP_Server(port);
@@ -229,7 +231,9 @@ public class ChatSystem { //instance de chat sur une machine
             cm.setIdMax(id);
 
                 try { // TODO: good idea try catch here ?
-                    UDP_Client.send_DEID(broadcastAddress, portUDP,  PORT_UDP, id);
+                    UDP_Client.send_DEID(broadcastAddress,  PORT_UDP, id);
+                    LOGGER.debug(" broadcast address : " + broadcastAddress);
+                    LOGGER.debug(" local address : " + this.ip);
                     LOGGER.info("Je suis "+ Thread.currentThread().getName() + " et je demande mon id = " + id);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -253,7 +257,7 @@ public class ChatSystem { //instance de chat sur une machine
        /** for(int p : Main.portList){ // TODO: Changer ce mécanisme dégueulasse quand on passera au cas réel sur des IPs
             if(p == this.portUDP) continue;*/
             try {// TODO: SE POSER LA QUESTION DE SI UNE EXCEPTION DOIT INTERROMPRE NOTRE PROGRAMME
-                UDP_Client.send_DEPS(broadcastAddress, portUDP,  PORT_UDP, pseudo);
+                UDP_Client.send_DEPS(broadcastAddress,  PORT_UDP, pseudo);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -273,7 +277,7 @@ public class ChatSystem { //instance de chat sur une machine
         cgmPseudoAccepted = true;
 
             try {
-                UDP_Client.send_CHPS(broadcastAddress, portUDP,  PORT_UDP, pseudo, this.getMonContact().getId());
+                UDP_Client.send_CHPS(broadcastAddress,  PORT_UDP, pseudo, this.getMonContact().getId());
             }catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -354,7 +358,7 @@ public class ChatSystem { //instance de chat sur une machine
             while (!this.isInterrupted()) {
 
                     try {// TODO: good idea try catch here ?
-                        UDP_Client.send_DECO(broadcastAddress, portUDP, PORT_UDP);
+                        UDP_Client.send_DECO(broadcastAddress, PORT_UDP);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

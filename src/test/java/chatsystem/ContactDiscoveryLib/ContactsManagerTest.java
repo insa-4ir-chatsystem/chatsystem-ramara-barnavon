@@ -1,7 +1,5 @@
 package chatsystem.ContactDiscoveryLib;
 
-import chatsystem.ContactDiscoveryLib.Contact;
-import chatsystem.ContactDiscoveryLib.ContactsManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -55,7 +53,7 @@ public class ContactsManagerTest {
         testContact.setTTL(0);
         testContact2.setTTL(3);
         contactsManager.decreaseTTL();
-        assertFalse(contactsManager.searchContactByID(testContact.getId()).getOnline()); // testContact should be removed from list
+        assertFalse(contactsManager.searchContactByID(testContact.getId()).isOnline()); // testContact should be removed from list
         assertEquals(2,testContact2.getTTL()); //TTL should be decreased
     }
 

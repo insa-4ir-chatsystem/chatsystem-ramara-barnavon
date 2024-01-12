@@ -16,7 +16,7 @@ public class DatagramManager {
         String pseudo = parties[1];
         int id = Integer.parseInt(parties[2]);
         Contact contact = new Contact(pseudo,id);
-        LOGGER.debug("INCO de " + contact + "envoyé");
+        LOGGER.trace("INCO de " + contact + "envoyé");
         return contact;
     }
 

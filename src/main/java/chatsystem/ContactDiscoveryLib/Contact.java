@@ -1,6 +1,5 @@
 package chatsystem.ContactDiscoveryLib;
 
-import java.util.Objects;
 /** this class contain the identity of a User in the network */
 public class Contact {
     private String pseudo;
@@ -42,7 +41,7 @@ public class Contact {
     public int getTTL(){
         return this.TTL;
     }
-    public boolean getOnline(){
+    public boolean isOnline(){
         return this.online;
     }
     public void setOnline(boolean online){
