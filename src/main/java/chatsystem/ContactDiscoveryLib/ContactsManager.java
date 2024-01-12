@@ -19,6 +19,7 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
         this.idMax = 1;
     }
 
+    // TODO: add observers to this class to update the contact list in the gui
 
     /** Getter/Setter */
     public void setMonContact(Contact monContact) {
