@@ -29,7 +29,7 @@ public class ChatSystem { //instance de chat sur une machine
     private Contact monContact;
     private UpdateContactsThread UCT;
     private int portUDP;
-    private int portTCP;
+    private int portTCPServeur;
     private boolean pseudoAccepted;
     private boolean cgmPseudoAccepted;
     private boolean IDAccepted;
@@ -41,7 +41,8 @@ public class ChatSystem { //instance de chat sur une machine
 
     private static final Logger LOGGER = LogManager.getLogger(ChatSystem.class);
     private final int PORT_UDP = 42069; // arbitrary ports to use on every machine
-    private final int PORT_TCP = 42070;
+    private final int PORT_TCP_SERVEUR = 42070;
+    private final int PORT_TCP_CLIENT = 42071;
 
 
     //TODO : Voir TODO main :)
@@ -53,12 +54,12 @@ public class ChatSystem { //instance de chat sur une machine
         this.monContact = new Contact();
         cm.setMonContact(this.monContact);
         this.portUDP = PORT_UDP;
-        this.portTCP = PORT_TCP;
+        this.portTCPServeur = PORT_TCP_SERVEUR;
         try {
             setAddresses();
             LOGGER.info("Adresse IP locale : " + this.ip);
             initServerUDP(this.portUDP);
-            initServerTCP(this.portTCP);
+            initServerTCP(this.portTCPServeur);
             //initServerTCP(port);
         } catch (Exception e) { // impossible to recover from this exception
             LOGGER.error("Unable to create UDP_Server with ip: " + ip + " and port: " + portUDP + "(" + e + ")");
@@ -208,7 +209,8 @@ public class ChatSystem { //instance de chat sur une machine
             }
         });
         /** =================================TCP============================================= */
-         startServerTCP();
+        //TODO: REGROUPER tous les méthodes UDPs ensemble, et toute les mé
+        startServerTCP();
         tcpServer.addObserver((received, ipSender) -> {
             int idSender = cm.searchContactByIP(ipSender.getHostAddress()).getId();
             try {
@@ -221,6 +223,9 @@ public class ChatSystem { //instance de chat sur une machine
 
         });
 
+
+
+
         startUpdateContacts();
         int id = chooseID();
         this.cm.setIdMax(id);//probleme avec idMax, ça lui répond 3 alors que son camarade à 4
@@ -230,6 +235,8 @@ public class ChatSystem { //instance de chat sur une machine
         monContact.setId(id);
 
     }
+
+
     public void initServerUDP(int port) throws SocketException, UnknownHostException {
         this.udpServer = new UDP_Server(port, this.ip);
         LOGGER.trace("Local UDP server initialized on port " + port);

@@ -26,6 +26,7 @@ public class GUI {
 
     private static final Logger LOGGER = LogManager.getLogger(GUI.class);
     private final ChatSystem CS;
+    private Contact currentContact;
 
     public GUI(ChatSystem cs) {
         this.CS = cs;
@@ -186,6 +187,12 @@ public class GUI {
             public void addContact(Contact contact) {
                 ContactItem contactItem = new ContactItem(contact);
                 contactListInnerPanel.add(contactItem);
+                contactItem.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        currentContact = contact;
+                    }
+                });
 
 
                 contactListInnerPanel.revalidate();
@@ -270,9 +277,9 @@ public class GUI {
             if(message.isEmpty()){
                 infoChangePseudo.setText("Please enter a message");
             }else{
-                CH.addMessage(new ChatMessage(99, 99, 99, message, LocalDateTime.now()));
+                CH.addSentMessage(new ChatMessage(99, 99, 99, message, LocalDateTime.now()));
             }
-            // TODO: get sender id
+            // TODO: get sender id and receiver's
         });
 
 

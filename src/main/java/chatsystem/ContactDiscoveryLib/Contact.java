@@ -1,11 +1,16 @@
 package chatsystem.ContactDiscoveryLib;
 
+import chatsystem.network.TCP_Client;
+
+import java.io.IOException;
+import java.net.InetAddress;
+
 /** this class contain the identity of a User in the network */
 public class Contact {
     private String pseudo;
     private String ip;
     private int id;
-
+    private TCP_Client tcp_client;
     /** time to live before removing from Contact list */
     private int TTL;
     private boolean online;
@@ -89,6 +94,19 @@ public class Contact {
     public boolean samePseudo(Contact contact){
         return contact.getPseudo().equals(this.pseudo);
     }
+
+
+    public void sendMessageTCP(String message, int port) throws IOException {
+        if (tcp_client != null) {
+            tcp_client.sendMessage(message);
+        } else {
+            tcp_client.startConnection(this.ip, port);
+            tcp_client.sendMessage(message);
+
+        }
+
+    }
+
 
     @Override
     public String toString() {
