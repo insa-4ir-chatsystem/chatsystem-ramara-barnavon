@@ -3,6 +3,7 @@ package chatsystem.ContactDiscoveryLib;
 /** this class contain the identity of a User in the network */
 public class Contact {
     private String pseudo;
+    private String ip;
     private int id;
 
     /** time to live before removing from Contact list */
@@ -16,9 +17,10 @@ public class Contact {
         this.pseudo = NO_PSEUDO;
         this.online = false;
     }
-    public Contact(String pseudo, int id){
-        this.id = id;
+    public Contact(String pseudo, String ip, int id){
         this.pseudo = pseudo;
+        this.ip = ip;
+        this.id = id;
     }
 
     public Contact(String pseudo, int id, int TTL, boolean online){
@@ -33,6 +35,10 @@ public class Contact {
     public String getPseudo() {
         return this.pseudo;
     }
+    public String getIp() {
+        return ip;
+    }
+
     public int getId() {
         return this.id;
     }
@@ -43,6 +49,9 @@ public class Contact {
     }
     public boolean isOnline(){
         return this.online;
+    }
+    public void setIp(String ip) {
+        this.ip = ip;
     }
     public void setOnline(boolean online){
         this.online = online;

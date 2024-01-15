@@ -68,6 +68,7 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
                 LOGGER.debug("Déjà présent dans la liste, mise à jour du TTL et du pseudo");
                 Contact contact = searchContactByID(c.getId());
                 contact.setPseudo(c.getPseudo());
+                contact.setIp(c.getIp());
                 contact.setTTL(4);
                 contact.setOnline(true);
                 notifyUpdateContactObservers(contact);
@@ -94,6 +95,14 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
     public synchronized Contact searchContactByPseudo(String contact){
         for(Contact c : this.contactList){
             if (c.getPseudo().equals(contact)){
+                return c;
+            }
+        }
+        return null;
+    }
+    public synchronized Contact searchContactByIP(String ip){
+        for(Contact c : this.contactList){
+            if (c.getIp().equals(ip)){
                 return c;
             }
         }

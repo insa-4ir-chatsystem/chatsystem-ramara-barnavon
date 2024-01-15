@@ -10,12 +10,12 @@ import org.apache.logging.log4j.Logger;
 public class DatagramManager {
     private static final Logger LOGGER = LogManager.getLogger(DatagramManager.class);
     /** INCO is the header to be handled here */
-    public static Contact INCOToContact(String mess){
+    public static Contact INCOToContact(String mess, String ip){
 
         String[] parties = mess.split(":");
         String pseudo = parties[1];
         int id = Integer.parseInt(parties[2]);
-        Contact contact = new Contact(pseudo,id);
+        Contact contact = new Contact(pseudo, ip, id);
         LOGGER.trace("INCO de " + contact + "envoyé");
         return contact;
     }

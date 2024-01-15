@@ -16,8 +16,8 @@ public class ContactsManagerTest {
     @BeforeEach
     public void setUp() {
         contactsManager = new ContactsManager();
-        testContact = new Contact("Test", 1);
-        testContact2 = new Contact("test2", 2);
+        testContact = new Contact("Test", "0.0.0.0", 1);
+        testContact2 = new Contact("test2", "0.0.0.0", 2);
     }
 
 

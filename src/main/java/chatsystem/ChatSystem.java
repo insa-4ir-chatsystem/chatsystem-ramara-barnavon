@@ -2,6 +2,7 @@ package chatsystem;
 
 import chatsystem.ContactDiscoveryLib.Contact;
 import chatsystem.ContactDiscoveryLib.ContactsManager;
+import chatsystem.database.ChatHistoryManager;
 import chatsystem.exceptions.PseudoRejectedException;
 import chatsystem.model.DatagramManager;
 import chatsystem.network.TCP_Server;
@@ -13,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.*;
+import java.sql.SQLException;
 import java.util.Enumeration;
 
 //Nos Headers sont sur 4 caracs
@@ -23,6 +25,7 @@ public class ChatSystem { //instance de chat sur une machine
 
 
     private ContactsManager cm;
+    private ChatHistoryManager chatHistoryManager;
     private Contact monContact;
     private UpdateContactsThread UCT;
     private int portUDP;
@@ -46,6 +49,7 @@ public class ChatSystem { //instance de chat sur une machine
     /** Constructor */
     public ChatSystem(){ //TODO: int portTCP;
         this.cm = new ContactsManager();
+        this.chatHistoryManager = new ChatHistoryManager();
         this.monContact = new Contact();
         cm.setMonContact(this.monContact);
         this.portUDP = PORT_UDP;
@@ -54,6 +58,7 @@ public class ChatSystem { //instance de chat sur une machine
             setAddresses();
             LOGGER.info("Adresse IP locale : " + this.ip);
             initServerUDP(this.portUDP);
+            initServerTCP(this.portTCP);
             //initServerTCP(port);
         } catch (Exception e) { // impossible to recover from this exception
             LOGGER.error("Unable to create UDP_Server with ip: " + ip + " and port: " + portUDP + "(" + e + ")");
@@ -126,7 +131,9 @@ public class ChatSystem { //instance de chat sur une machine
     /** Starts an instance of ChatSystem */
 
     public synchronized void start(){
+        /** =================================UDP============================================= */
         startServerUDP();
+
 
 
         udpServer.addObserver((received, port) -> {
@@ -134,10 +141,11 @@ public class ChatSystem { //instance de chat sur une machine
 
                 if (received != null) {
                     String msg = received.content();
+                    InetAddress origin = received.origin();
 
                     switch (DatagramManager.getHeader(msg)) { //TODO : y'a plein de nom sos forme "nom_de_X" à mettre en "nomDeX"
                         case INCO: // On reçoit une info de contact, il faut l'ajouter à notre liste de contacts
-                            cm.updateContact(DatagramManager.INCOToContact(msg));
+                            cm.updateContact(DatagramManager.INCOToContact(msg, origin.getHostAddress()));
                             break;
 
                         case DECO: //On reçoit une demande de contact, on souhaite renvoyer notre contact au destinaire
@@ -199,8 +207,19 @@ public class ChatSystem { //instance de chat sur une machine
                 LOGGER.error(e.getMessage());
             }
         });
+        /** =================================TCP============================================= */
+         startServerTCP();
+        tcpServer.addObserver((received, ipSender) -> {
+            int idSender = cm.searchContactByIP(ipSender.getHostAddress()).getId();
+            try {
+                LOGGER.debug("J'insère le message"+  received  + "dans la DB");
+                chatHistoryManager.insertMessage(idSender,this.monContact.getId(),received);
+            } catch (SQLException e) {
+                LOGGER.error(e.getMessage());
+                throw new RuntimeException(e);
+            }
 
-        //udpServer.addObserver(received -> LOGGER.info("Received from udpServer: " + received));
+        });
 
         startUpdateContacts();
         int id = chooseID();

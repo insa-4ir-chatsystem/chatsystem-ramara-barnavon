@@ -10,10 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.time.LocalDateTime;
@@ -121,37 +118,19 @@ public class GUI {
         itemTest2.setOffline();
          */
 
-        /** fake ChatHistory for testing purposes */
+        /** fake ChatHistory for testing purposes
         ChatHistory ChatHistory1 = new ChatHistory();
         ChatHistory1.addMessage(new ChatMessage(0, 1, "message 1", LocalDateTime.now()));
         ChatHistory1.addMessage(new ChatMessage(1, 0, "message 2", LocalDateTime.now()));
         ChatHistory1.addMessage(new ChatMessage(1, 0, "messagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessage 2", LocalDateTime.now()));
-
-        /** //////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-        // Create JTextAreas and add them to the panel
-        for (int i = 0; i < 5; i++) {
-            JTextArea textArea = new JTextArea("TextArea " + (i + 1));
-            textArea.setEditable(false); // Optionally, set to false if you want read-only text areas
-            panel.add(textArea);
-        }
-
-        JTextArea textArea = new JTextArea("TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea ");
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
-        textArea.setEditable(false);
-        panel.add(textArea);
-
-        // Create a JScrollPane and add the panel to it
-        JScrollPane scrollPane = new JScrollPane(panel);
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
+        */
         /** //////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
 
+
+        /** //////////////////////////////////////////////////////////////////////////////////////////////////////////*/
+
+        ChatHistory CH = new ChatHistory();
 
         // Add components to the chat history panel
         JTextArea chatHistory = new JTextArea();
@@ -179,9 +158,8 @@ public class GUI {
         contactListPanel.setMinimumSize(new Dimension(450, 400));
 
         // Create a split pane for contact list and chat history
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true, contactListPanel, scrollPane);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true, contactListPanel, CH);
         //splitPane.setResizeWeight(0.3); // Adjust the divider location
-
         // Add the split pane and input panel to the frame
         Chatting.add(chattingTitle, BorderLayout.NORTH);
         Chatting.add(splitPane, BorderLayout.CENTER);
@@ -208,6 +186,8 @@ public class GUI {
             public void addContact(Contact contact) {
                 ContactItem contactItem = new ContactItem(contact);
                 contactListInnerPanel.add(contactItem);
+
+
                 contactListInnerPanel.revalidate();
                 contactListInnerPanel.repaint();
             }
@@ -290,7 +270,7 @@ public class GUI {
             if(message.isEmpty()){
                 infoChangePseudo.setText("Please enter a message");
             }else{
-                ChatHistory1.addMessage(new ChatMessage(99, 99, message, LocalDateTime.now()));
+                CH.addMessage(new ChatMessage(99, 99, 99, message, LocalDateTime.now()));
             }
             // TODO: get sender id
         });

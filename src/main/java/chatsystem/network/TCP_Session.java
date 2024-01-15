@@ -19,27 +19,31 @@ public class TCP_Session extends Thread {
     private BufferedReader in;
     private PrintWriter out;
     private final List<TCP_Session.Observer> observers = new ArrayList<>();
+    private final InetAddress ipSender;
     /** Constructor */
-    public TCP_Session(Socket clientSocket, BufferedReader in,PrintWriter out) {
+    public TCP_Session(Socket clientSocket) {
         this.clientSocket = clientSocket;
-        this.in = in;
-        this.out = out;
+        this.ipSender = clientSocket.getInetAddress();
+
     }
 
     /** Methods */
     public interface Observer {
         /** Method that is called each time a message is received. */
-        void handle(String received);
+        void handle(String received, InetAddress ipSender);
     }
     public void addObserver(TCP_Session.Observer obs) {
         synchronized (this.observers) {
             this.observers.add(obs);
         }
     }
+    /** */
+
     public String listen() throws IOException{
         out = new PrintWriter(clientSocket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         String message = in.readLine();
+
         LOGGER.debug(message);
 
         return message;
@@ -56,13 +60,12 @@ public class TCP_Session extends Thread {
         while(!this.isInterrupted()) {
             try {
                 String message = listen();
-
-                /** String Handler */
                 synchronized (this.observers) {
                     for (TCP_Session.Observer obs : this.observers) {
-                        obs.handle(message);
+                        obs.handle(message, this.ipSender);
                     }
                 }
+
 
             } catch (IOException e) {
                 LOGGER.error("Receive error: " + e.getMessage());
