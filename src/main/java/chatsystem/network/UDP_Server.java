@@ -8,6 +8,7 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO:réfléchir comment lier les différentes session avec les observers et le FRONT
 /** UDP server that (once started) listens indefinitely on a given port. */
 public class UDP_Server extends Thread {
 

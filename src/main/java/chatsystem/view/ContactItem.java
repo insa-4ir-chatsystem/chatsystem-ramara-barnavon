@@ -75,7 +75,6 @@ public class ContactItem extends JPanel {
             setOnline();
         }else{
             setOffline();
-            System.out.println("C LA MERDEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
         }
     }
 

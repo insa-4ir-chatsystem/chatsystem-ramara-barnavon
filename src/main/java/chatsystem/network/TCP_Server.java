@@ -16,8 +16,8 @@ public class TCP_Server extends Thread {
     private static final Logger LOGGER = LogManager.getLogger(TCP_Server.class);
     private final ServerSocket serverSocket;
     private Socket clientSocket;
-    private BufferedReader in;
-    private PrintWriter out;
+
+
 
     //private final List<TCP_Server.Observer> observers = new ArrayList<>();
 
@@ -30,16 +30,18 @@ public class TCP_Server extends Thread {
            serverSocket = new ServerSocket(port);
     }
 
+
+
+
     public void run() {
         while(!this.isInterrupted()) {
 
             try {
-                clientSocket = serverSocket.accept(); // TODO: créer un thread pour toutes les connections entrantes
+                clientSocket = serverSocket.accept();
+                // TODO: créer un thread pour toutes les connections entrantes
+                //create_listening_thread(clientSocket)
 
-                out = new PrintWriter(clientSocket.getOutputStream(), true);
-                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                String message = in.readLine();
-                LOGGER.debug(message);
+
 
 
 
@@ -54,9 +56,6 @@ public class TCP_Server extends Thread {
     }
     public void close() throws IOException{
         /** close everything */
-
-            in.close();
-            clientSocket.close();
             serverSocket.close();
             this.interrupt();
     }

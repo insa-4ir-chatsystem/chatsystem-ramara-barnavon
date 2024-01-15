@@ -14,6 +14,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import javax.swing.*;
@@ -109,7 +111,7 @@ public class GUI {
         contactListPanel.add(contactListTitle, BorderLayout.NORTH);
         contactListPanel.add(contactScrollPane, BorderLayout.CENTER);
 
-        /** fake contacts for testing purposes */
+        /** fake contacts for testing purposes
         ContactItem itemTest = new ContactItem(new Contact("pseudoTest", 12));
         contactListInnerPanel.add(itemTest);
         ContactItem itemTest2 = new ContactItem(new Contact("pseudoTest2", 22));
@@ -117,12 +119,39 @@ public class GUI {
         ContactItem itemTest3 = new ContactItem(new Contact("pseudoTest2", 23));
         contactListInnerPanel.add(itemTest3);
         itemTest2.setOffline();
+         */
 
         /** fake ChatHistory for testing purposes */
         ChatHistory ChatHistory1 = new ChatHistory();
         ChatHistory1.addMessage(new ChatMessage(0, 1, "message 1", LocalDateTime.now()));
         ChatHistory1.addMessage(new ChatMessage(1, 0, "message 2", LocalDateTime.now()));
         ChatHistory1.addMessage(new ChatMessage(1, 0, "messagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessage 2", LocalDateTime.now()));
+
+        /** //////////////////////////////////////////////////////////////////////////////////////////////////////////*/
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        // Create JTextAreas and add them to the panel
+        for (int i = 0; i < 5; i++) {
+            JTextArea textArea = new JTextArea("TextArea " + (i + 1));
+            textArea.setEditable(false); // Optionally, set to false if you want read-only text areas
+            panel.add(textArea);
+        }
+
+        JTextArea textArea = new JTextArea("TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea TextArea ");
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setEditable(false);
+        panel.add(textArea);
+
+        // Create a JScrollPane and add the panel to it
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        /** //////////////////////////////////////////////////////////////////////////////////////////////////////////*/
+
+
 
         // Add components to the chat history panel
         JTextArea chatHistory = new JTextArea();
@@ -150,8 +179,8 @@ public class GUI {
         contactListPanel.setMinimumSize(new Dimension(450, 400));
 
         // Create a split pane for contact list and chat history
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, contactListPanel, ChatHistory1);
-        //splitPane.setResizeWeight(0.1); // Adjust the divider location
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true, contactListPanel, scrollPane);
+        //splitPane.setResizeWeight(0.3); // Adjust the divider location
 
         // Add the split pane and input panel to the frame
         Chatting.add(chattingTitle, BorderLayout.NORTH);
@@ -168,6 +197,9 @@ public class GUI {
         frame.setVisible(true);
 
         //MainVM.setViewOfFrame(frame, Sign)
+
+
+
 
         /** ======================    Adding observers to ContactManager    =============================== */
 
@@ -216,6 +248,7 @@ public class GUI {
                     CS.getCm().setMonContact(CS.getMonContact());
                     LOGGER.trace("Chatsystem " + askedPseudo + " started correctly");
                     contactListTitle.setText("Connected as " + CS.getMonContact().getPseudo());
+                    loginInfo.setText("");
                     MainVM.setViewOfFrame(frame, Chatting);
                 }else{
                     loginInfo.setText("Please enter a pseudo");
@@ -238,6 +271,7 @@ public class GUI {
                     CS.getCm().setMonContact(CS.getMonContact());
                     LOGGER.trace("Chatsystem " + askedPseudo + " changed correctly");
                     pseudoFieldd.setText("");
+                    infoChangePseudo.setText("");
                     contactListTitle.setText("Connected as " + CS.getMonContact().getPseudo());
                 }else{
                     infoChangePseudo.setText("Please enter a pseudo");
