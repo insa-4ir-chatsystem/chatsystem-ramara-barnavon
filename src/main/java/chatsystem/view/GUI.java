@@ -172,7 +172,7 @@ public class GUI {
         MainVM.setViewOfFrame(frame, Login);
 
         //frame.add(Login);
-        frame.setSize(600, 600);
+        frame.setSize(700, 600);
         frame.setVisible(true);
 
         //MainVM.setViewOfFrame(frame, Sign)
