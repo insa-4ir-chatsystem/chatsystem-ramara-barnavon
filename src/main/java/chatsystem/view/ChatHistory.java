@@ -1,6 +1,5 @@
 package chatsystem.view;
 
-import chatsystem.ContactDiscoveryLib.Contact;
 import chatsystem.database.ChatMessage;
 
 import javax.swing.*;
@@ -10,6 +9,7 @@ import javax.swing.text.Highlighter;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
 
 /** A ChatHistory is used to display previous and current exchanged messages with a Contact */
 public class ChatHistory extends JScrollPane { // Corresponding Contact necessary as attribute ?
@@ -55,7 +55,7 @@ public class ChatHistory extends JScrollPane { // Corresponding Contact necessar
 
 
         //textArea.setMaximumSize(new Dimension(10000, 15*textArea.getLineCount()));
-        panel.add(timeArea);
+        //panel.add(timeArea);
         panel.add(textArea);
         panel.revalidate();
         panel.repaint();
@@ -88,7 +88,7 @@ public class ChatHistory extends JScrollPane { // Corresponding Contact necessar
 
 
         //textArea.setMaximumSize(new Dimension(10000, 15*textArea.getLineCount()));
-        panel.add(timeArea);
+        //panel.add(timeArea);
         panel.add(textArea);
         panel.revalidate();
         panel.repaint();
@@ -106,8 +106,14 @@ public class ChatHistory extends JScrollPane { // Corresponding Contact necessar
     }
 
     /** Loads a conversation from the DataBase */
-    public void getHistoryOf(Contact me, Contact other){
-        //TODO : Get all the messages exchanged between the contacts and add them in the right order in the panel
+    public void loadHistory(ArrayList<ChatMessage> messageList, int localID){
+        for(ChatMessage mess : messageList){
+            if(mess.senderId() == localID){
+                addSentMessage(mess);
+            }else{
+                addReceivedMessage(mess);
+            }
+        }
     }
 
 

@@ -36,10 +36,6 @@ public class ContactItem extends JPanel {
         this.add(onlineMark);
 
         addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-
-            }
 
             @Override
             public void mouseEntered(MouseEvent e) {

@@ -100,6 +100,7 @@ public class Contact {
         if (tcp_client != null) {
             tcp_client.sendMessage(message);
         } else {
+            tcp_client = new TCP_Client();
             tcp_client.startConnection(this.ip, port);
             tcp_client.sendMessage(message);
 

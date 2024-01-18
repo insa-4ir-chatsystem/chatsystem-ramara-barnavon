@@ -36,7 +36,7 @@ class ChatHistoryManagerTest {
     void testInsertMessage() {
         try {
             chatHistoryManager.insertMessage(1, 2, "Hello");
-            ArrayList<ChatMessage> history = chatHistoryManager.getHistoryOf(1);
+            ArrayList<ChatMessage> history = chatHistoryManager.getSentTo(1, 2);
             assertEquals(1, history.size());
             assertEquals("Hello", history.get(0).content());
         } catch (SQLException e) {
@@ -52,8 +52,8 @@ class ChatHistoryManagerTest {
             chatHistoryManager.insertMessage(1, 2,"Message2");
             chatHistoryManager.insertMessage(2, 1,"Message3");
 
-            ArrayList<ChatMessage> history1 = chatHistoryManager.getHistoryOf(1);
-            ArrayList<ChatMessage> history2 = chatHistoryManager.getHistoryOf(2);
+            ArrayList<ChatMessage> history1 = chatHistoryManager.getHistoryOf(1, 2);
+            ArrayList<ChatMessage> history2 = chatHistoryManager.getHistoryOf(2, 1);
 
             assertEquals(2, history1.size());
             assertEquals(1, history2.size());
@@ -70,7 +70,7 @@ class ChatHistoryManagerTest {
         try{
             chatHistoryManager.insertMessage(1, 2,"Hello");
             chatHistoryManager.deleteChatHistoryTable();
-            assertThrows(SQLException.class, () -> chatHistoryManager.getHistoryOf(1));
+            assertThrows(SQLException.class, () -> chatHistoryManager.getHistoryOf(1, 2));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

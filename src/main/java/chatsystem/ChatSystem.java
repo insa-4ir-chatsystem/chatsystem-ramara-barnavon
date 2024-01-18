@@ -41,8 +41,7 @@ public class ChatSystem { //instance de chat sur une machine
 
     private static final Logger LOGGER = LogManager.getLogger(ChatSystem.class);
     private final int PORT_UDP = 42069; // arbitrary ports to use on every machine
-    private final int PORT_TCP_SERVEUR = 42070;
-    private final int PORT_TCP_CLIENT = 42071;
+    public final int PORT_TCP_SERVEUR = 42070;
 
 
     //TODO : Voir TODO main :)
@@ -84,6 +83,13 @@ public class ChatSystem { //instance de chat sur une machine
         return cm;
     }
 
+    public ChatHistoryManager getChatHistoryManager() {
+        return chatHistoryManager;
+    }
+
+    public TCP_Server getTcpServer() {
+        return this.tcpServer;
+    }
     /** gets the broadcast address of the first network interface and assigns it to the attribute */
     public void setAddresses() throws SocketException{
         try {

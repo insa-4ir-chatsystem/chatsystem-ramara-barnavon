@@ -11,8 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import javax.swing.*;
@@ -172,7 +171,8 @@ public class GUI {
         MainVM.setViewOfFrame(frame, Login);
 
         //frame.add(Login);
-        frame.setSize(700, 600);
+        frame.setSize(800, 600);
+        frame.setResizable(false);
         frame.setVisible(true);
 
         //MainVM.setViewOfFrame(frame, Sign)
@@ -190,7 +190,15 @@ public class GUI {
                 contactItem.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
+                        super.mouseClicked(e);
                         currentContact = contact;
+                        try {
+                            ArrayList<ChatMessage> messList = CS.getChatHistoryManager().getHistoryOf(currentContact.getId(), CS.getMonContact().getId());
+                            CH.flushHistory();
+                            CH.loadHistory(messList, CS.getMonContact().getId());
+                        } catch (SQLException ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
                 });
 
@@ -220,6 +228,21 @@ public class GUI {
             }
         });
 
+        /** ======================    Adding observers to TcpServer    =============================== */
+
+        this.CS.getTcpServer().addObserver((received, ipSender) -> {
+            int otherID = this.CS.getCm().searchContactByIP(ipSender.getHostAddress()).getId();
+            int myId = this.CS.getMonContact().getId();
+            try {
+                this.CS.getChatHistoryManager().insertMessage(otherID, myId, received);
+                if(otherID == this.currentContact.getId()){
+                    CH.addReceivedMessage(new ChatMessage(otherID, myId, received, LocalDateTime.now()));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+        });
 
         /** ======================    Action Listeners Implementation    ================================ */
 
@@ -274,10 +297,20 @@ public class GUI {
         sendMessageButton.addActionListener(e -> {
             String message = messageField.getText();
             messageField.setText("");
-            if(message.isEmpty()){
-                infoChangePseudo.setText("Please enter a message");
-            }else{
-                CH.addSentMessage(new ChatMessage(99, 99, 99, message, LocalDateTime.now()));
+            try {
+                if (message.isEmpty()) {
+                    infoChangePseudo.setText("Please enter a message");
+                } else if (this.currentContact == null) {
+                    infoChangePseudo.setText("Please choose a contact to chat with");
+                } else {
+                    int myID = this.CS.getMonContact().getId();
+                    int otherID = this.currentContact.getId();
+                    this.currentContact.sendMessageTCP(message, this.CS.PORT_TCP_SERVEUR);
+                    this.CS.getChatHistoryManager().insertMessage(myID, otherID, message);
+                    CH.addSentMessage(new ChatMessage(myID, otherID, message, LocalDateTime.now()));
+                }
+            }catch(Exception ex){
+                throw new RuntimeException(ex);
             }
             // TODO: get sender id and receiver's
         });

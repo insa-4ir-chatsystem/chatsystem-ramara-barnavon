@@ -3,6 +3,7 @@ package chatsystem.database;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /** This class is used to manage the DB containing all the messages */
 public class ChatHistoryManager {
@@ -46,26 +47,18 @@ public class ChatHistoryManager {
         }
     }
 
-    /** Gets all the messages sent by a contact, searching by its ID */
-    public ArrayList<ChatMessage> getHistoryOf(int sender) throws SQLException {
-        String sql = "SELECT * FROM chat_history WHERE sender = ?";
-        ArrayList<ChatMessage> Qresult = new ArrayList<>();
+    /** Gets all the messages exchanged between two contacts, ordered by timestamp */
+    public ArrayList<ChatMessage> getHistoryOf(int contact1, int contact2) throws SQLException {
+        ArrayList<ChatMessage> part1 = getSentTo(contact1, contact2);
+        ArrayList<ChatMessage> part2 = getSentTo(contact2, contact1);
 
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             PreparedStatement query = conn.prepareStatement(sql)) {
-            query.setInt(1, sender);
-            ResultSet resultSet = query.executeQuery();
-            while (resultSet.next()) {
-                int Mid = resultSet.getInt("id");
-                int senderId = resultSet.getInt("sender");
-                int receiverId = resultSet.getInt("receiver");
-                String content = resultSet.getString("message");
-                LocalDateTime timestamp = resultSet.getTimestamp("timestamp").toLocalDateTime();
 
-                Qresult.add(new ChatMessage(Mid, senderId, receiverId, content, timestamp));
-            }
-        }
-        return Qresult;
+        ArrayList<ChatMessage> all = new ArrayList<>(part1);
+        all.addAll(part2);
+        Collections.sort(all);
+
+        return all;
+
     }
 
     /** Gets all the messages sent with id senderID to id receiverID */
@@ -85,7 +78,7 @@ public class ChatHistoryManager {
                 String content = resultSet.getString("message");
                 LocalDateTime timestamp = resultSet.getTimestamp("timestamp").toLocalDateTime();
 
-                Qresult.add(new ChatMessage(Mid, senderId, receiverId, content, timestamp));
+                Qresult.add(new ChatMessage(senderId, receiverId, content, timestamp));
             }
         }
         return Qresult;
