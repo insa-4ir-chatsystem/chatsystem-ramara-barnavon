@@ -1,16 +1,13 @@
 package chatsystem.ContactDiscoveryLib;
 
-import chatsystem.network.UDP_Message;
-import chatsystem.network.UDP_Server;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /** This class is used to handle the local list of contact in the network */
-public class ContactsManager { // verif de la liste de contacts (expirations) toutes les 20s minimum
+public class ContactsManager {
     private ArrayList<Contact> contactList;
     private Contact monContact;
     private int idMax;
@@ -26,7 +23,7 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
         void updateContact(Contact contact);
     }
 
-    /** Adds a new observer to the class, for which the handle method will be called for each incoming message. */
+    /** Adds a new observer to the class */
     public void addObserver(ContactsManager.Observer obs) {
         synchronized (this.observers) {
             this.observers.add(obs);
@@ -36,19 +33,22 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
 
     /** Constructor */
     public ContactsManager(){
+        this.monContact = new Contact();
         this.contactList = new ArrayList<>();
         this.idMax = 1;
     }
 
-    // TODO: add observers to this class to update the contact list in the gui
-
-    /** Getter/Setter */
+    /** Getters/Setters */
     public void setMonContact(Contact monContact) {
         this.monContact = monContact;
     }
 
     public void setIdMax(int idMax) {
         this.idMax = Math.max(this.idMax, idMax);
+    }
+
+    public Contact getMonContact() {
+        return monContact;
     }
 
     public int getIdMax() {
@@ -59,12 +59,14 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
         return contactList;
     }
 
+
+
     /** Methods */
 
-
+    /** Processes the contact information we are receiving */
     public synchronized void updateContact(Contact c) {
         if (!c.getPseudo().equals(Contact.NO_PSEUDO)) {
-            if (contactList.contains(c)) { //contains marche que avec l'id
+            if (contactList.contains(c)) { // update contact info if needed
                 LOGGER.trace("Déjà présent dans la liste, mise à jour du TTL et du pseudo");
                 Contact contact = searchContactByID(c.getId());
                 contact.setPseudo(c.getPseudo());
@@ -72,7 +74,7 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
                 contact.setTTL(4);
                 contact.setOnline(true);
                 notifyUpdateContactObservers(contact);
-            } else {
+            } else { // otherwise adds it to the list
                 c.setTTL(4);
                 c.setOnline(true);
                 notifyAddContactObservers(c);
@@ -83,6 +85,7 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
         }
     }
 
+    /** Searches a contact by its unique ID */
     public synchronized Contact searchContactByID(int id){
         for(Contact c : this.contactList){
             if (c.getId() == (id)){
@@ -92,6 +95,7 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
         return null;
     }
 
+    /** Searches a contact by its unique pseudo */
     public synchronized Contact searchContactByPseudo(String contact){
         for(Contact c : this.contactList){
             if (c.getPseudo().equals(contact)){
@@ -100,6 +104,8 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
         }
         return null;
     }
+
+    /** Searches a contact by its unique IP address */
     public synchronized Contact searchContactByIP(String ip){
         for(Contact c : this.contactList){
             if (c.getIp().equals(ip)){
@@ -109,11 +115,9 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
         return null;
     }
 
+    /** Decreases the TTL of all the contacts of the list */
     public synchronized void decreaseTTL() {
-        Iterator<Contact> iterator = this.contactList.iterator();
-        //LOGGER.info("List of contact to be ttldecreased : " + contactList);
-        while (iterator.hasNext()) { //strange because needed before
-            Contact c = iterator.next();
+        for(Contact c : this.contactList){
             if(!c.isOnline()){
                 continue;
             }
@@ -126,8 +130,8 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
         }
     }
 
-
-    public synchronized void afficherListe() {
+    /** Displays the current list of contacts */
+    public synchronized void printContactList() {
         if (!contactList.isEmpty()) {
             for (Contact contact : this.contactList) {
                 LOGGER.debug("    {" + monContact.getPseudo() + "}    " + contact);
@@ -137,7 +141,7 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
         }
     }
 
-    // Notify all observers that a contact is added
+    /** Notify all observers that a contact is added */
     private void notifyAddContactObservers(Contact contact) {
         synchronized (this.observers) {
             for (Observer observer : this.observers) {
@@ -146,7 +150,7 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
         }
     }
 
-    // Notify all observers that a contact is updated
+    /** Notify all observers that a contact is updated */
     private void notifyUpdateContactObservers(Contact contact) {
         synchronized (this.observers) {
             for (Observer observer : this.observers) {

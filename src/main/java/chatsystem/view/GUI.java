@@ -183,7 +183,7 @@ public class GUI {
 
 
         LOGGER.debug("BEFORE Adding observer to CM");
-        this.CS.getCm().addObserver(new ContactsManager.Observer() {
+        this.CS.getContactsManager().addObserver(new ContactsManager.Observer() {
             @Override
             public void addContact(Contact contact) {
                 ContactItem contactItem = new ContactItem(contact);
@@ -234,7 +234,7 @@ public class GUI {
         /** ======================    Adding observers to TcpServer    =============================== */
 
         this.CS.getTcpServer().addObserver((received, ipSender) -> {
-            int otherID = this.CS.getCm().searchContactByIP(ipSender.getHostAddress()).getId();
+            int otherID = this.CS.getContactsManager().searchContactByIP(ipSender.getHostAddress()).getId();
             int myId = this.CS.getMonContact().getId();
             try {
                 this.CS.getChatHistoryManager().insertMessage(otherID, myId, received);
@@ -254,7 +254,7 @@ public class GUI {
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                CS.closeTcpServer();
+                CS.closeChat();
                 System.exit(0);
             }
         });
@@ -265,8 +265,8 @@ public class GUI {
                 if(!askedPseudo.isEmpty()){
                     CS.choosePseudo(askedPseudo);
                     CS.getMonContact().setPseudo(askedPseudo);
-                    CS.getUCT().setName("UCT Thread - " + askedPseudo);
-                    CS.getCm().setMonContact(CS.getMonContact());
+                    CS.getUpdateContactListThread().setName("UCT Thread - " + askedPseudo);
+                    CS.getContactsManager().setMonContact(CS.getMonContact());
                     LOGGER.trace("Chatsystem " + askedPseudo + " started correctly");
                     contactListTitle.setText("Connected as " + CS.getMonContact().getPseudo());
                     loginInfo.setText("");
@@ -288,8 +288,8 @@ public class GUI {
                 if(!askedPseudo.isEmpty()){
                     CS.changePseudo(askedPseudo);
                     CS.getMonContact().setPseudo(askedPseudo);
-                    CS.getUCT().setName("UCT Thread - " + askedPseudo);
-                    CS.getCm().setMonContact(CS.getMonContact());
+                    CS.getUpdateContactListThread().setName("UCT Thread - " + askedPseudo);
+                    CS.getContactsManager().setMonContact(CS.getMonContact());
                     LOGGER.trace("Chatsystem " + askedPseudo + " changed correctly");
                     pseudoFieldd.setText("");
                     infoChangePseudo.setText("");
@@ -316,7 +316,7 @@ public class GUI {
                 } else {
                     int myID = this.CS.getMonContact().getId();
                     int otherID = this.currentContact.getId();
-                    this.currentContact.sendMessageTCP(message, this.CS.PORT_TCP_SERVEUR);
+                    this.currentContact.sendMessageTCP(message, this.CS.PORT_TCP);
                     this.CS.getChatHistoryManager().insertMessage(myID, otherID, message);
                     CH.addSentMessage(new ChatMessage(myID, otherID, message, LocalDateTime.now()));
                 }

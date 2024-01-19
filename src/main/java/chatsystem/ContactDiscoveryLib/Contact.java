@@ -11,8 +11,7 @@ public class Contact {
     private String ip;
     private int id;
     private TCP_Client tcp_client;
-    /** time to live before removing from Contact list */
-    private int TTL;
+    private int TTL; //time to live before being offline
     private boolean online;
     public static final String NO_PSEUDO = "M.Anonyme (n'a pas encore obtenu de pseudo)";
 
@@ -76,9 +75,12 @@ public class Contact {
 
 
     /** Methods */
+
     public void decrementTTL(){
         this.TTL--;
     }
+
+    /** Two contacts are equals iff their IDs are equal */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -95,7 +97,7 @@ public class Contact {
         return contact.getPseudo().equals(this.pseudo);
     }
 
-
+    /** Sends a TCP message on the given port */
     public void sendMessageTCP(String message, int port) throws IOException {
         if (tcp_client != null) {
             tcp_client.sendMessage(message);

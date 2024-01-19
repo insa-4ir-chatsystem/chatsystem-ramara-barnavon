@@ -17,6 +17,7 @@ class ChatHistoryManagerTest {
         chatHistoryManager = new ChatHistoryManager();
 
         try {
+            chatHistoryManager.deleteChatHistoryTable();
             chatHistoryManager.createChatHistoryTable();
         } catch (SQLException e) {
             throw new RuntimeException(e);
