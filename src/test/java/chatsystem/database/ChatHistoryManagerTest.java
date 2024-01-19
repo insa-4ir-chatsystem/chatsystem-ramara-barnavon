@@ -52,8 +52,8 @@ class ChatHistoryManagerTest {
             chatHistoryManager.insertMessage(1, 2,"Message2");
             chatHistoryManager.insertMessage(2, 1,"Message3");
 
-            ArrayList<ChatMessage> history1 = chatHistoryManager.getHistoryOf(1, 2);
-            ArrayList<ChatMessage> history2 = chatHistoryManager.getHistoryOf(2, 1);
+            ArrayList<ChatMessage> history1 = chatHistoryManager.getSentTo(1, 2);
+            ArrayList<ChatMessage> history2 = chatHistoryManager.getSentTo(2, 1);
 
             assertEquals(2, history1.size());
             assertEquals(1, history2.size());

@@ -69,7 +69,7 @@ public class ChatHistoryManager {
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement query = conn.prepareStatement(sql)) {
             query.setInt(1, senderID);
-            query.setInt(1, receiverID);
+            query.setInt(2, receiverID);
             ResultSet resultSet = query.executeQuery();
             while (resultSet.next()) {
                 int Mid = resultSet.getInt("id");
