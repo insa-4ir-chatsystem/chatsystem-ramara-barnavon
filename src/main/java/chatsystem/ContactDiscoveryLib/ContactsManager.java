@@ -65,7 +65,7 @@ public class ContactsManager { // verif de la liste de contacts (expirations) to
     public synchronized void updateContact(Contact c) {
         if (!c.getPseudo().equals(Contact.NO_PSEUDO)) {
             if (contactList.contains(c)) { //contains marche que avec l'id
-                LOGGER.debug("Déjà présent dans la liste, mise à jour du TTL et du pseudo");
+                LOGGER.trace("Déjà présent dans la liste, mise à jour du TTL et du pseudo");
                 Contact contact = searchContactByID(c.getId());
                 contact.setPseudo(c.getPseudo());
                 contact.setIp(c.getIp());

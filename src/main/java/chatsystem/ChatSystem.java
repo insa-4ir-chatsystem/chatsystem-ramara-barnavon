@@ -217,6 +217,13 @@ public class ChatSystem { //instance de chat sur une machine
         /** =================================TCP============================================= */
         //TODO: REGROUPER tous les méthodes UDPs ensemble, et toute les mé
         startServerTCP();
+        try {
+            chatHistoryManager.createChatHistoryTable();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        /*
         tcpServer.addObserver((received, ipSender) -> {
             int idSender = cm.searchContactByIP(ipSender.getHostAddress()).getId();
             try {
@@ -228,7 +235,7 @@ public class ChatSystem { //instance de chat sur une machine
             }
 
         });
-
+        */
 
 
 
