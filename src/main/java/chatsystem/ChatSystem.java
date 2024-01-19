@@ -156,7 +156,7 @@ public class ChatSystem { //instance de chat sur une machine
                             break;
 
                         case DECO: //On reçoit une demande de contact, on souhaite renvoyer notre contact au destinaire
-                            if ((monContact != null && (monContact.getId() != -1))) {
+                            if (monContact != null && (monContact.getId() != -1)) {
                                 UDP_Client.send_INCO(received.origin(), DatagramManager.getPort(msg), monContact);
                             }
                             break;

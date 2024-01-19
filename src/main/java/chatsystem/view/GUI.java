@@ -173,7 +173,6 @@ public class GUI {
         //frame.add(Login);
         frame.setSize(800, 600);
         frame.setResizable(false);
-        frame.setVisible(true);
 
         //MainVM.setViewOfFrame(frame, Sign)
 
@@ -182,11 +181,14 @@ public class GUI {
 
         /** ======================    Adding observers to ContactManager    =============================== */
 
+
+        LOGGER.debug("BEFORE Adding observer to CM");
         this.CS.getCm().addObserver(new ContactsManager.Observer() {
             @Override
             public void addContact(Contact contact) {
                 ContactItem contactItem = new ContactItem(contact);
                 contactListInnerPanel.add(contactItem);
+                LOGGER.debug("INTO ADD OBSERVER");
                 contactItem.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
@@ -227,6 +229,7 @@ public class GUI {
                 contactListInnerPanel.repaint();
             }
         });
+        LOGGER.debug("AFTER Adding observer to CM");
 
         /** ======================    Adding observers to TcpServer    =============================== */
 
@@ -235,7 +238,7 @@ public class GUI {
             int myId = this.CS.getMonContact().getId();
             try {
                 this.CS.getChatHistoryManager().insertMessage(otherID, myId, received);
-                if(otherID == this.currentContact.getId()){
+                if(this.currentContact != null && otherID == this.currentContact.getId()){
                     CH.addReceivedMessage(new ChatMessage(otherID, myId, received, LocalDateTime.now()));
                 }
             } catch (SQLException e) {
@@ -315,16 +318,17 @@ public class GUI {
             // TODO: get sender id and receiver's
         });
 
+        frame.setVisible(true);
 
     }
 
 
     public void start() {
-        this.CS.start();
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
 
                 createAndShowGUI();
+                CS.start();
                 LOGGER.info("Showing gui");
                 // TODO:
                 //  Boucle d'update de tous les composants graphiques ?
