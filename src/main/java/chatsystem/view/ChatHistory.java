@@ -55,7 +55,7 @@ public class ChatHistory extends JScrollPane { // Corresponding Contact necessar
 
 
         //textArea.setMaximumSize(new Dimension(10000, 15*textArea.getLineCount()));
-        //panel.add(timeArea);
+        panel.add(timeArea);
         panel.add(textArea);
         panel.revalidate();
         panel.repaint();
@@ -88,7 +88,7 @@ public class ChatHistory extends JScrollPane { // Corresponding Contact necessar
 
 
         //textArea.setMaximumSize(new Dimension(10000, 15*textArea.getLineCount()));
-        //panel.add(timeArea);
+        panel.add(timeArea);
         panel.add(textArea);
         panel.revalidate();
         panel.repaint();

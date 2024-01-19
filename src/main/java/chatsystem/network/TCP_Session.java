@@ -14,10 +14,9 @@ import java.util.List;
 /** Thread qui doit être lancé pour chaque session de chat actif avec quelqu'un du rezo */
 public class TCP_Session extends Thread {
     /** Attribute */
-    private static final Logger LOGGER = LogManager.getLogger(TCP_Server.class);
+    private static final Logger LOGGER = LogManager.getLogger(TCP_Session.class);
     private Socket clientSocket;
     private BufferedReader in;
-    private PrintWriter out;
     private final List<TCP_Session.Observer> observers = new ArrayList<>();
     private final InetAddress ipSender;
     /** Constructor */
@@ -40,7 +39,6 @@ public class TCP_Session extends Thread {
     /** */
 
     public String listen() throws IOException{
-        out = new PrintWriter(clientSocket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         String message = in.readLine();
 
@@ -60,6 +58,12 @@ public class TCP_Session extends Thread {
         while(!this.isInterrupted()) {
             try {
                 String message = listen();
+                if (message != null) {
+                    LOGGER.debug(message);
+                } else {
+                    LOGGER.debug("Client disconnected, ip = " + ipSender);
+                    break;
+                }
                 synchronized (this.observers) {
                     for (TCP_Session.Observer obs : this.observers) {
                         obs.handle(message, this.ipSender);

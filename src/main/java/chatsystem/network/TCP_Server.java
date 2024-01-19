@@ -64,7 +64,11 @@ public class TCP_Server extends Thread {
 
 
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                if (e.getMessage().contains("Socket closed")){
+                    LOGGER.debug("socket TCP fermé");
+                }else{
+                    throw new RuntimeException(e);
+                }
             }
 
 

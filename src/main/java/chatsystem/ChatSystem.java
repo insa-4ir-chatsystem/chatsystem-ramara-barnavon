@@ -359,6 +359,14 @@ public class ChatSystem { //instance de chat sur une machine
         /**tcpServer.close();*/
     }
 
+    public void closeTcpServer(){
+        try {
+            tcpServer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void startUpdateContacts(){
         LOGGER.trace("Lancement du Thread d'update des contacts");
         this.UCT = new UpdateContactsThread();

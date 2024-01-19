@@ -16,7 +16,7 @@ public class ChatHistoryManager {
                 "sender INT," +
                 "receiver INT," +
                 "message TEXT," +
-                "timestamp DATETIME DEFAULT CURRENT_TIMESTAMP" +
+                "timestamp DATETIME DEFAULT (datetime('now', '+1 hour'))" + // UTC+1
                 ")";
 
         try (Connection conn = DriverManager.getConnection(DB_URL);

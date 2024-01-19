@@ -251,6 +251,14 @@ public class GUI {
 
         /** button to choose pseudo and start chatting */
 
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                CS.closeTcpServer();
+                System.exit(0);
+            }
+        });
+
         buttonStartChatting.addActionListener(e -> {
             String askedPseudo = pseudoField1.getText();
             try {
