@@ -1,9 +1,7 @@
-package chatsystem;
+package chatsystem.ContactDiscoveryLib;
 
-import chatsystem.ContactDiscoveryLib.Contact;
-import chatsystem.ContactDiscoveryLib.ContactsManager;
-import chatsystem.ContactDiscoveryLib.UpdateContactListThread;
 import chatsystem.database.ChatHistoryManager;
+import chatsystem.exceptions.IdRejectedException;
 import chatsystem.exceptions.PseudoRejectedException;
 import chatsystem.model.DatagramManager;
 import chatsystem.network.TCP_Server;
@@ -18,7 +16,7 @@ import java.net.*;
 import java.sql.SQLException;
 import java.util.Enumeration;
 
-/** This class manages all the components required to create a chat system */
+/** This class manages all the components required for a contact discovery phase */
 public class ChatSystem {
 
     /** ---------------------------------- Attributes ------------------------------------------- */
@@ -45,6 +43,7 @@ public class ChatSystem {
     public ChatSystem(){
         this.contactsManager = new ContactsManager();
         this.chatHistoryManager = new ChatHistoryManager();
+
         try {
             setAddresses();
             LOGGER.info("Adresse IP locale : " + this.ip);
@@ -56,6 +55,7 @@ public class ChatSystem {
             System.exit(1);
         }
         LOGGER.info("Chatsystem Created");
+
     }
 
 
@@ -72,7 +72,9 @@ public class ChatSystem {
     public ChatHistoryManager getChatHistoryManager() {
         return chatHistoryManager;
     }
-
+    public UpdateContactListThread getUpdateContactListThread() {
+        return this.updateContactListThread;
+    }
     public TCP_Server getTcpServer() {
         return this.tcpServer;
     }
@@ -82,7 +84,7 @@ public class ChatSystem {
         this.getMonContact().setId(id);
     }
 
-    /** sets the broadcast and IP address of the first network interface and assigns it to the attribute */
+    /** gets the broadcast and IP address of the first network interface and assigns it to the attribute */
     public void setAddresses(){
         try {
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
@@ -145,15 +147,18 @@ public class ChatSystem {
         addUdpServerObserver();
         startUpdateContacts();
 
-        int id = chooseID();
-        this.contactsManager.setIdMax(id);
-        while(id == -1){ // waits for the ID to be accepted by others
-            ;
+        try{
+            int id = chooseID();
+            this.contactsManager.setIdMax(id);
+            getMonContact().setId(id);
+        } catch (IdRejectedException e){
+            LOGGER.error("Unable to find a suitable ID, exiting");
+            System.exit(1);
         }
-        getMonContact().setId(id);
 
     }
 
+    /** Adds the method which will process the incoming UDP datagrams to the UDP_Server observer */
     private void addUdpServerObserver(){
         udpServer.addObserver((received, port) -> {
             try {
@@ -162,12 +167,12 @@ public class ChatSystem {
                     String msg = received.content();
                     InetAddress origin = received.origin();
 
-                    switch (DatagramManager.getHeader(msg)) { //TODO : y'a plein de nom sos forme "nom_de_X" à mettre en "nomDeX"
-                        case INCO: // On reçoit une info de contact, il faut l'ajouter à notre liste de contacts
+                    switch (DatagramManager.getHeader(msg)) {
+                        case INCO: // On reçoit une info de contact, il faut mettre à jour la liste de contacts
                             contactsManager.updateContact(DatagramManager.INCOToContact(msg, origin.getHostAddress()));
                             break;
 
-                        case DECO: //On reçoit une demande de contact, on souhaite renvoyer notre contact au destinaire
+                        case DECO: //On reçoit une demande d'information de contact, on souhaite renvoyer notre contact au destinaire
                             if (getMonContact() != null && (getMonContact().getId() != -1)) {
                                 UDP_Client.send_INCO(received.origin(), DatagramManager.getPort(msg), getMonContact());
                             }
@@ -177,38 +182,35 @@ public class ChatSystem {
                             pseudoAccepted = false;
                             break;
 
-                        case DEPS: //
+                        case DEPS: // On reçoit une demande de pseudo, on la rejette si le pseudo n'est pas dispo
                             String his_pseudo = DatagramManager.XXPSToPseudo(msg);
                             LOGGER.debug("Mon pseudo est : " + this.getMonContact().getPseudo() + " pseudo demandé : " + his_pseudo);
                             if (contactsManager.searchContactByPseudo(his_pseudo) != null || (this.getMonContact() != null && his_pseudo.equals(getMonContact().getPseudo()))) { //Si le pseudo existe déjà
                                 UDP_Client.send_REPS(received.origin(), DatagramManager.getPort(msg));
                                 LOGGER.debug("Mon pseudo est : " + this.getMonContact().getPseudo() + " Refus du pseudo " + his_pseudo);
-                            } //else on fait rien il ( il supposera que oui tant que personne lui dit non )
-
+                            }
                             break;
 
-                        case DEID: //si l'ID existe il refuse avec un id_conseillé ( le max + 1 de sa liste ) si l'ID n'existe pas, il renvoie rien
+                        case DEID: //si l'ID existe il refuse avec un id_conseillé ( le max + 1 de sa liste )
                             int his_id = DatagramManager.XXIDToId(msg);
-                            if (his_id <= contactsManager.getIdMax()) { //Si l'id existe déjà
-                                UDP_Client.send_REID(received.origin(), DatagramManager.getPort(msg), his_id + 1); //on renvoie refus et on donne l'id conseillé
-                                //cm.setIdMax(his_id + 1);
-                            } //else on fait rien il ( il supposera que oui tant que personne lui dit non )
+                            if (his_id <= contactsManager.getIdMax()) {
+                                UDP_Client.send_REID(received.origin(), DatagramManager.getPort(msg), his_id + 1);
+                            }
                             break;
 
-                        case REID: //Si on reçoit un refus alors notre ID n'est pas accepté et c'est la fonction start() qui relancera une requete si besoin
+                        case REID: //Si on reçoit un refus alors notre ID n'est pas accepté et c'est la fonction chooseID() qui relancera une requete si besoin
                             int suggest_id = DatagramManager.XXIDToId(msg);
                             IDAccepted = false;
                             contactsManager.setIdMax(suggest_id);
                             break;
-                        case CHPS: //
+
+                        case CHPS: // On reçoit une demande de changement de pseudo, on la refuse si un contact possède déja ce pseudo
                             String hisNewPseudo = DatagramManager.XXPSToPseudo(msg);
-                            Integer hisOldID = DatagramManager.XXPSToID(msg);
                             if (contactsManager.searchContactByPseudo(hisNewPseudo) != null || (getMonContact() != null && hisNewPseudo.equals(getMonContact().getPseudo()))) { //Si le pseudo existe déjà
                                 UDP_Client.send_RECH(received.origin(), DatagramManager.getPort(msg));
-                                /** ( l'emetteur supposera que c'est bon tant que personne lui refuse son nouveau pseudo )*/
                             }
-
                             break;
+
                         case RECH: // Si le pseudo demandé est refusé par un contact
                             changePseudoAccepted = false;
                             break;
@@ -218,9 +220,7 @@ public class ChatSystem {
 
                         default:
                             LOGGER.error("Header inconnu : " + msg);
-
                     }
-
                 }
             }catch (IOException e){
                 LOGGER.error(e.getMessage());
@@ -228,16 +228,20 @@ public class ChatSystem {
         });
     }
 
-
+    /** Initializes the UDP server of the ChatSystem */
     public void initServerUDP(int port) throws SocketException, UnknownHostException {
         this.udpServer = new UDP_Server(port, this.ip);
         LOGGER.trace("Local UDP server initialized on port " + port);
     }
-    public void initServerTCP(int port) throws SocketException, UnknownHostException, IOException {
+
+    /** Initializes the TCP server of the ChatSystem */
+    public void initServerTCP(int port) throws IOException {
         this.tcpServer = new TCP_Server(port);
-        LOGGER.trace("Local TCP server initialized");
+        LOGGER.trace("Local TCP server initialized on port " + port);
     }
-    private int chooseID(){
+
+    /** Chooses an ID, ensuring it is unique and returns it */
+    private int chooseID() throws IdRejectedException {
         IDAccepted = false;
         int ite = 0;
         int id = -1;
@@ -248,17 +252,17 @@ public class ChatSystem {
             id = contactsManager.getIdMax();
             contactsManager.setIdMax(id);
 
-                try { // TODO: good idea try catch here ?
+                try {
                     UDP_Client.send_DEID(broadcastAddress,  PORT_UDP, id);
                     LOGGER.debug(" broadcast address : " + broadcastAddress);
                     LOGGER.debug(" local address : " + this.ip);
-                    LOGGER.info("Je suis "+ Thread.currentThread().getName() + " et je demande mon id = " + id);
+                    LOGGER.debug("Je suis "+ Thread.currentThread().getName() + " et je demande mon id = " + id);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    LOGGER.error(e.getMessage());
                 }
 
-            try {
-                Thread.sleep(1000);
+            try { // Wait for others users to respond
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -266,20 +270,23 @@ public class ChatSystem {
         if(IDAccepted){
             LOGGER.info("Id accepté et unique : " + id );
             return id;
-        }else { return -1; } //TODO: mettre une exception ici
+        }else {
+            throw new IdRejectedException(id);
+        }
         
     }
 
+    /** Chooses a pseudo, ensuring it is unique  */
     public synchronized void choosePseudo (String pseudo) throws PseudoRejectedException {
         pseudoAccepted = true;
-            try {// TODO: SE POSER LA QUESTION DE SI UNE EXCEPTION DOIT INTERROMPRE NOTRE PROGRAMME
+            try {
                 UDP_Client.send_DEPS(broadcastAddress,  PORT_UDP, pseudo);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                LOGGER.error(e.getMessage());
             }
 
-        try { // wait for others to respond
-            Thread.sleep(1000);
+        try { // Wait for others users to respond
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -289,22 +296,25 @@ public class ChatSystem {
         getMonContact().setPseudo(pseudo);
 
     }
+
+    /** Changes the pseudo, ensuring it is still unique  */
     public synchronized void changePseudo(String pseudo) throws PseudoRejectedException {
         changePseudoAccepted = true;
 
             try {
                 UDP_Client.send_CHPS(broadcastAddress,  PORT_UDP, pseudo, this.getMonContact().getId());
             }catch (IOException e) {
-                throw new RuntimeException(e);
+                LOGGER.error(e.getMessage());
             }
 
-        try {
-            Thread.sleep(1000);
+        try { // Wait for others users to respond
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+
         if(!changePseudoAccepted){
-            LOGGER.info("Pseudo " + pseudo + " non disponible, veuillez reesayer avec un pseudo différent");
+            LOGGER.debug("Pseudo " + pseudo + " non disponible, veuillez reesayer avec un pseudo différent");
             throw new PseudoRejectedException(pseudo);
         } else {
             this.getMonContact().setPseudo(pseudo);
@@ -317,26 +327,29 @@ public class ChatSystem {
 
     }
 
-
-
-
+    /** Starts the UDP server of the ChatSystem */
     public void startServerUDP(){
         LOGGER.trace("Lancement du Serveur UDP");
         udpServer.start();
     }
+
+    /** Starts the TCP server of the ChatSystem */
     public void startServerTCP(){
         LOGGER.trace("Lancement du Serveur TCP");
         tcpServer.start();
     }
 
-    public void closeUdpServer(){
+    /** Closes the UDP server of the ChatSystem */
+    public void closeServerUDP(){
         udpServer.close();
     }
 
-    public void closeTcpServer() throws IOException {
+    /** Closes the TCP server of the ChatSystem */
+    public void closeServerTCP() throws IOException {
             tcpServer.close();
     }
 
+    /** Starts the Thread responsible for updating the contact list */
     public void startUpdateContacts(){
         LOGGER.trace("Lancement du Thread d'update des contacts");
         this.updateContactListThread = new UpdateContactListThread(this.broadcastAddress, this.contactsManager);
@@ -344,6 +357,7 @@ public class ChatSystem {
         updateContactListThread.setName("UCT Thread - " + this.getMonContact().getPseudo());
     }
 
+    /** Displays the current contact list */
     public void afficherListeContacts(){
         LOGGER.info("Je suis " + getMonContact().getPseudo() + " et ma liste de contact est :");
         //System.out.println("[");
@@ -351,27 +365,18 @@ public class ChatSystem {
         //System.out.println("]");
     }
 
+    /** Closes the ChatSystem */
     public void closeChat(){
         LOGGER.trace("Tentative d'interruption du serveur UDP :  " + getMonContact().getPseudo());
-        closeUdpServer();
+        closeServerUDP();
         try {
-            closeTcpServer();
+            closeServerTCP();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.error(e.getMessage());
         }
         if (updateContactListThread != null){
             LOGGER.trace("Tentative d'interruption du Thread d'update de " + getMonContact().getPseudo());
             updateContactListThread.interrupt();
         }
     }
-
-    public boolean isStarted(){
-        return udpServer.isAlive();
-    }
-
-    public UpdateContactListThread getUpdateContactListThread() {
-        return this.updateContactListThread;
-    }
-
-
 }

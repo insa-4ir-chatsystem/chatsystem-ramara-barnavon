@@ -3,4 +3,4 @@
 *.jar
 .vscode/
 .run/
-target/
+target/*

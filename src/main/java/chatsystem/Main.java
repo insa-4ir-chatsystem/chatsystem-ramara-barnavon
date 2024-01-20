@@ -1,13 +1,12 @@
 package chatsystem;
 
+import chatsystem.ContactDiscoveryLib.ChatSystem;
 import chatsystem.view.GUI;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 //TODO : comprendre pourquoi en réseau on capte pas les refus et fixé l'auto answer
 public class Main {

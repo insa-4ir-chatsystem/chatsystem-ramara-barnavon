@@ -1,7 +1,7 @@
 package chatsystem.view;
 
 
-import chatsystem.ChatSystem;
+import chatsystem.ContactDiscoveryLib.ChatSystem;
 import chatsystem.ContactDiscoveryLib.Contact;
 import chatsystem.ContactDiscoveryLib.ContactsManager;
 import chatsystem.database.ChatMessage;
@@ -171,7 +171,7 @@ public class GUI {
         MainVM.setViewOfFrame(frame, Login);
 
         //frame.add(Login);
-        frame.setSize(800, 600);
+        frame.setSize(900, 600);
         frame.setResizable(false);
 
         //MainVM.setViewOfFrame(frame, Sign)
@@ -182,13 +182,11 @@ public class GUI {
         /** ======================    Adding observers to ContactManager    =============================== */
 
 
-        LOGGER.debug("BEFORE Adding observer to CM");
         this.CS.getContactsManager().addObserver(new ContactsManager.Observer() {
             @Override
             public void addContact(Contact contact) {
                 ContactItem contactItem = new ContactItem(contact);
                 contactListInnerPanel.add(contactItem);
-                LOGGER.debug("INTO ADD OBSERVER");
                 contactItem.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
@@ -229,7 +227,6 @@ public class GUI {
                 contactListInnerPanel.repaint();
             }
         });
-        LOGGER.debug("AFTER Adding observer to CM");
 
         /** ======================    Adding observers to TcpServer    =============================== */
 

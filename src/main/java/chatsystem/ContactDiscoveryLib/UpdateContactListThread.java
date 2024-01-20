@@ -1,6 +1,5 @@
 package chatsystem.ContactDiscoveryLib;
 
-import chatsystem.ChatSystem;
 import chatsystem.network.UDP_Client;
 
 import java.io.IOException;
