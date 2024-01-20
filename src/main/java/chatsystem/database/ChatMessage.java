@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 
+/** A ChatMessage represents a message sent on the network plus the timestamp and IDs*/
 public record ChatMessage(int senderId, int receiverId, String content, LocalDateTime timestamp) implements Comparable<ChatMessage>{
 
     @Override

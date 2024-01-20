@@ -1,5 +1,7 @@
-package chatsystem.ContactDiscoveryLib;
+package chatsystem.model.contact_discovery;
 
+import chatsystem.model.contact_discovery.Contact;
+import chatsystem.model.contact_discovery.ContactsManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

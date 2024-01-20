@@ -1,4 +1,4 @@
-package chatsystem.ContactDiscoveryLib;
+package chatsystem.model.contact_discovery;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

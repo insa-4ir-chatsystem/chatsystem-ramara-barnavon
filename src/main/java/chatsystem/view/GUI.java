@@ -1,9 +1,9 @@
 package chatsystem.view;
 
 
-import chatsystem.ContactDiscoveryLib.ChatSystem;
-import chatsystem.ContactDiscoveryLib.Contact;
-import chatsystem.ContactDiscoveryLib.ContactsManager;
+import chatsystem.controller.ChatSystem;
+import chatsystem.model.contact_discovery.Contact;
+import chatsystem.model.contact_discovery.ContactsManager;
 import chatsystem.database.ChatMessage;
 import chatsystem.exceptions.PseudoRejectedException;
 import org.apache.logging.log4j.LogManager;
@@ -16,12 +16,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import javax.swing.*;
 
+/** This class creates all the Objects to be displayed and adds Action Listeners to them */
 public class GUI {
-
-    //TODO:
-    // Create one ChatView per contact
-    // Update a ChatView everytime we receive/send a message
-    // Convert local implementation to LAN
 
     private static final Logger LOGGER = LogManager.getLogger(GUI.class);
     private final ChatSystem CS;
@@ -33,31 +29,18 @@ public class GUI {
 
     private void createAndShowGUI() {
 
-        //final int[] UID = {-1};
-
-        //TODO : Mettrre a jour le GUI quand On reçoit des messages
-        ViewManager MainVM = new ViewManager();
-        ViewManager ChatVM = new ViewManager(); // To display the right Chat instance
-
         // Create and set up the window.
         JFrame frame = new JFrame("Clavard'App");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        ViewManager viewManager = new ViewManager();
+
         /** Creation and initialization of the main views */
-        JPanel Login = MainVM.createPanelView(); // First page to be displayed to choose a pseudo
-        JPanel Chatting = MainVM.createPanelView(); // Page to chat with contacts
+        JPanel Login = viewManager.createPanelView(); // First page to be displayed to choose a pseudo
+        JPanel Chatting = viewManager.createPanelView(); // Page to chat with contacts
 
         Login.setLayout(new BoxLayout(Login, BoxLayout.Y_AXIS));
         Chatting.setLayout(new BorderLayout());
-
-
-
-        /** Creation of ActionListeners to switch the view */
-        ChangeView ShowLogin = new ChangeView(frame, MainVM, Login);
-        ChangeView ShowChatting = new ChangeView(frame, MainVM, Chatting);
-
-
-
 
 
         /** Creating pages */
@@ -69,25 +52,18 @@ public class GUI {
         JLabel loginInfo = new JLabel("");
         loginInfo.setForeground(Color.RED);
 
-        JPanel pseudoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel pseudoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); //For correct component sizing
         JTextField pseudoField1 = new JTextField(30);
 
         pseudoPanel.add(pseudoField1);
         pseudoField1.setPreferredSize(new Dimension(100, 30));
         JButton buttonStartChatting = new JButton("Start chatting");
 
-
-
         Login.add(loginTitle);
         Login.add(pseudoPanel);
         Login.add(loginInfo);
         Login.add(buttonStartChatting);
 
-        /*
-        Login.add(loginTitle, BorderLayout.NORTH);
-        Login.add(pseudoPanel, BorderLayout.CENTER);
-        Login.add(buttonStartChatting, BorderLayout.SOUTH);
-        */
 
         /** ---------------------- Chatting page ------------------------ */
 
@@ -107,28 +83,6 @@ public class GUI {
         JLabel contactListTitle = new JLabel();
         contactListPanel.add(contactListTitle, BorderLayout.NORTH);
         contactListPanel.add(contactScrollPane, BorderLayout.CENTER);
-
-        /** fake contacts for testing purposes
-        ContactItem itemTest = new ContactItem(new Contact("pseudoTest", 12));
-        contactListInnerPanel.add(itemTest);
-        ContactItem itemTest2 = new ContactItem(new Contact("pseudoTest2", 22));
-        contactListInnerPanel.add(itemTest2);
-        ContactItem itemTest3 = new ContactItem(new Contact("pseudoTest2", 23));
-        contactListInnerPanel.add(itemTest3);
-        itemTest2.setOffline();
-         */
-
-        /** fake ChatHistory for testing purposes
-        ChatHistory ChatHistory1 = new ChatHistory();
-        ChatHistory1.addMessage(new ChatMessage(0, 1, "message 1", LocalDateTime.now()));
-        ChatHistory1.addMessage(new ChatMessage(1, 0, "message 2", LocalDateTime.now()));
-        ChatHistory1.addMessage(new ChatMessage(1, 0, "messagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessage 2", LocalDateTime.now()));
-        */
-        /** //////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-
-
-
-        /** //////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
         ChatHistory CH = new ChatHistory();
 
@@ -168,13 +122,13 @@ public class GUI {
         //Chatting.setVisible(true);
         //Login.setVisible(true);
 
-        MainVM.setViewOfFrame(frame, Login);
+        viewManager.setViewOfFrame(frame, Login);
 
         //frame.add(Login);
         frame.setSize(900, 600);
         frame.setResizable(false);
 
-        //MainVM.setViewOfFrame(frame, Sign)
+        //viewManager.setViewOfFrame(frame, Sign)
 
 
 
@@ -267,7 +221,7 @@ public class GUI {
                     LOGGER.trace("Chatsystem " + askedPseudo + " started correctly");
                     contactListTitle.setText("Connected as " + CS.getMonContact().getPseudo());
                     loginInfo.setText("");
-                    MainVM.setViewOfFrame(frame, Chatting);
+                    viewManager.setViewOfFrame(frame, Chatting);
                 }else{
                     loginInfo.setText("Please enter a pseudo");
                 }
@@ -335,9 +289,6 @@ public class GUI {
                 createAndShowGUI();
                 CS.start();
                 LOGGER.info("Showing gui");
-                // TODO:
-                //  Boucle d'update de tous les composants graphiques ?
-                //  Ex : si un contact n'est plus en ligne, changer sa pastille
 
             }
         });
@@ -346,47 +297,5 @@ public class GUI {
 
 
     /** A few ActionListeners definitions */
-
-    /** This ActionListener changes the view of the current JFrame */
-    public static class ChangeView implements ActionListener {
-        private JPanel View;
-        private ViewManager VM;
-        private JFrame frame;
-
-        public ChangeView(JFrame frame, ViewManager VM, JPanel View) {
-            this.View = View;
-            this.VM = VM;
-            this.frame = frame;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            VM.setViewOfFrame(frame, View);
-        }
-
-    }
-
-    public static class ChangeActiveChat implements ActionListener {
-        private JPanel View;
-        private ViewManager VM;
-        private JFrame frame;
-
-        public ChangeActiveChat(JFrame frame, ViewManager VM, JPanel View) {
-            this.View = View;
-            this.VM = VM;
-            this.frame = frame;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            VM.setViewOfFrame(frame, View);
-        }
-
-    }
-
-
-
-
-
 
 }

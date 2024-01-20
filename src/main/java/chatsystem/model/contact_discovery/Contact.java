@@ -1,9 +1,8 @@
-package chatsystem.ContactDiscoveryLib;
+package chatsystem.model.contact_discovery;
 
 import chatsystem.network.TCP_Client;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 /** this class contain the identity of a User in the network */
 public class Contact {

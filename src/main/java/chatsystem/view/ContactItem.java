@@ -1,6 +1,6 @@
 package chatsystem.view;
 
-import chatsystem.ContactDiscoveryLib.Contact;
+import chatsystem.model.contact_discovery.Contact;
 
 import javax.swing.*;
 import java.awt.*;

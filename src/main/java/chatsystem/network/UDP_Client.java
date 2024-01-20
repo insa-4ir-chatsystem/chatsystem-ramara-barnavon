@@ -1,6 +1,6 @@
 package chatsystem.network;
 
-import chatsystem.ContactDiscoveryLib.Contact;
+import chatsystem.model.contact_discovery.Contact;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

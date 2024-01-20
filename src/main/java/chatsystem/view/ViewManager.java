@@ -7,7 +7,6 @@ import java.util.ArrayList;
 /** A ViewManager allows to manage views in a JFrame : We can choose the active view and hide all the others */
 public class ViewManager {
 
-
     private ArrayList<Component> ViewList;
     private Component visibleView;
 

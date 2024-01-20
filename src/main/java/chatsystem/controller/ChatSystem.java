@@ -1,9 +1,12 @@
-package chatsystem.ContactDiscoveryLib;
+package chatsystem.controller;
 
+import chatsystem.model.contact_discovery.Contact;
+import chatsystem.model.contact_discovery.ContactsManager;
+import chatsystem.model.contact_discovery.UpdateContactListThread;
 import chatsystem.database.ChatHistoryManager;
 import chatsystem.exceptions.IdRejectedException;
 import chatsystem.exceptions.PseudoRejectedException;
-import chatsystem.model.DatagramManager;
+import chatsystem.model.contact_discovery.udp_headers.DatagramManager;
 import chatsystem.network.TCP_Server;
 import chatsystem.network.UDP_Client;
 import chatsystem.network.UDP_Server;
