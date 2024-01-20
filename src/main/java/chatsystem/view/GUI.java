@@ -20,11 +20,11 @@ import javax.swing.*;
 public class GUI {
 
     private static final Logger LOGGER = LogManager.getLogger(GUI.class);
-    private final ChatSystem CS;
+    private final ChatSystem chatSystem;
     private Contact currentContact;
 
-    public GUI(ChatSystem cs) {
-        this.CS = cs;
+    public GUI(ChatSystem chatSystem) {
+        this.chatSystem = chatSystem;
     }
 
     private void createAndShowGUI() {
@@ -35,29 +35,26 @@ public class GUI {
 
         ViewManager viewManager = new ViewManager();
 
-        /** Creation and initialization of the main views */
-        JPanel Login = viewManager.createPanelView(); // First page to be displayed to choose a pseudo
-        JPanel Chatting = viewManager.createPanelView(); // Page to chat with contacts
-
-        Login.setLayout(new BoxLayout(Login, BoxLayout.Y_AXIS));
-        Chatting.setLayout(new BorderLayout());
 
 
         /** Creating pages */
 
         /** ---------------------- Logging in page ------------------------ */
 
-        JLabel loginTitle = new JLabel("Welcome to Clavard'App\n Please choose your pseudo ", JLabel.CENTER);
-        loginTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-        JLabel loginInfo = new JLabel("");
-        loginInfo.setForeground(Color.RED);
+        JPanel Login = viewManager.createPanelView(); // First page to be displayed to choose a pseudo
+        Login.setLayout(new BoxLayout(Login, BoxLayout.Y_AXIS));
 
-        JPanel pseudoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); //For correct component sizing
-        JTextField pseudoField1 = new JTextField(30);
+            JLabel loginTitle = new JLabel("Welcome to Clavard'App\n Please choose your pseudo ", JLabel.CENTER);
+            loginTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+            JLabel loginInfo = new JLabel("");
+            loginInfo.setForeground(Color.RED);
 
-        pseudoPanel.add(pseudoField1);
-        pseudoField1.setPreferredSize(new Dimension(100, 30));
-        JButton buttonStartChatting = new JButton("Start chatting");
+            JPanel pseudoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); //For correct component sizing
+            JTextField pseudoField1 = new JTextField(30);
+
+            pseudoPanel.add(pseudoField1);
+            pseudoField1.setPreferredSize(new Dimension(100, 30));
+            JButton buttonStartChatting = new JButton("Start chatting");
 
         Login.add(loginTitle);
         Login.add(pseudoPanel);
@@ -67,76 +64,79 @@ public class GUI {
 
         /** ---------------------- Chatting page ------------------------ */
 
-        JLabel chattingTitle = new JLabel("Start chatting with your contacts", JLabel.CENTER);
 
-        JPanel contactListPanel = new JPanel(new BorderLayout());
-        JPanel EmptyChatHistoryPanel = new JPanel(new BorderLayout());
-        JPanel inputPanel = new JPanel(new BorderLayout());
-        JPanel contactInputPanel = new JPanel(new FlowLayout()); // Panel for contact input
+        JPanel Chatting = viewManager.createPanelView();
+        Chatting.setLayout(new BorderLayout());
 
-        JPanel contactListInnerPanel = new JPanel();
-        contactListInnerPanel.setLayout(new BoxLayout(contactListInnerPanel, BoxLayout.Y_AXIS));
+            JLabel chattingTitle = new JLabel("Start chatting with your contacts", JLabel.CENTER);
 
-        // Add components to the contact list panel
-        JScrollPane contactScrollPane = new JScrollPane(contactListInnerPanel);
+            // Create a split pane for contact list and chat history
+            JSplitPane centerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true);
 
-        JLabel contactListTitle = new JLabel();
-        contactListPanel.add(contactListTitle, BorderLayout.NORTH);
-        contactListPanel.add(contactScrollPane, BorderLayout.CENTER);
+                JPanel contactListPanel = new JPanel(new BorderLayout());
 
-        ChatHistory CH = new ChatHistory();
+                    JLabel contactListTitle = new JLabel();
+                    JPanel contactListInnerPanel = new JPanel();
+                    contactListInnerPanel.setLayout(new BoxLayout(contactListInnerPanel, BoxLayout.Y_AXIS));
+                    JScrollPane contactScrollPane = new JScrollPane(contactListInnerPanel);
 
-        // Add components to the chat history panel
-        JTextArea chatHistory = new JTextArea();
-        JScrollPane chatScrollPane = new JScrollPane(chatHistory);
-        chatHistory.setEditable(false);
-        chatHistory.setLineWrap(true);
-        chatHistory.setWrapStyleWord(true); // go to next line at the end of the word
-        EmptyChatHistoryPanel.add(chatScrollPane, BorderLayout.CENTER);
+                    JPanel contactInputPanel = new JPanel(new FlowLayout());
 
-        // Add components to the input panel for sending messages
-        JTextField messageField = new JTextField(20);
-        JButton sendMessageButton = new JButton("Send");
-        JLabel infoChangePseudo = new JLabel("");
-        infoChangePseudo.setForeground(Color.RED);
-        inputPanel.add(infoChangePseudo, BorderLayout.NORTH);
-        inputPanel.add(messageField, BorderLayout.CENTER);
-        inputPanel.add(sendMessageButton, BorderLayout.EAST);
+                        JTextField pseudoFieldd = new JTextField(20);
+                        JButton changePseudoButton = new JButton("Change Pseudonym");
 
-        // Add components to the input panel for changing pseudonym
-        JTextField pseudoFieldd = new JTextField(20);
-        JButton changePseudoButton = new JButton("Change Pseudonym");
-        contactInputPanel.add(pseudoFieldd);
-        contactInputPanel.add(changePseudoButton);
-        contactListPanel.add(contactInputPanel, BorderLayout.SOUTH);
-        contactListPanel.setMinimumSize(new Dimension(450, 400));
+                    contactInputPanel.add(pseudoFieldd);
+                    contactInputPanel.add(changePseudoButton);
 
-        // Create a split pane for contact list and chat history
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true, contactListPanel, CH);
-        //splitPane.setResizeWeight(0.3); // Adjust the divider location
-        // Add the split pane and input panel to the frame
+                contactListPanel.add(contactListTitle, BorderLayout.NORTH);
+                contactListPanel.add(contactScrollPane, BorderLayout.CENTER);
+                contactListPanel.add(contactInputPanel, BorderLayout.SOUTH);
+                contactListPanel.setMinimumSize(new Dimension(450, 400));
+
+                ChatHistory chatHistory = new ChatHistory();
+
+            centerSplitPane.setLeftComponent(contactListPanel);
+            centerSplitPane.setRightComponent(chatHistory);
+
+
+
+            JPanel messageInputPanel = new JPanel(new BorderLayout());
+
+                JLabel infoChangePseudo = new JLabel("");
+                infoChangePseudo.setForeground(Color.RED);
+
+                JTextField messageField = new JTextField(20);
+                JButton sendMessageButton = new JButton("Send");
+
+            messageInputPanel.add(infoChangePseudo, BorderLayout.NORTH);
+            messageInputPanel.add(messageField, BorderLayout.CENTER);
+            messageInputPanel.add(sendMessageButton, BorderLayout.EAST);
+
+
+
+
+        // Add all the components to the main panel
         Chatting.add(chattingTitle, BorderLayout.NORTH);
-        Chatting.add(splitPane, BorderLayout.CENTER);
-        Chatting.add(inputPanel, BorderLayout.SOUTH);
+        Chatting.add(centerSplitPane, BorderLayout.CENTER);
+        Chatting.add(messageInputPanel, BorderLayout.SOUTH);
 
-        //Chatting.setVisible(true);
-        //Login.setVisible(true);
+
+
 
         viewManager.setViewOfFrame(frame, Login);
-
-        //frame.add(Login);
         frame.setSize(900, 600);
         frame.setResizable(false);
 
-        //viewManager.setViewOfFrame(frame, Sign)
 
 
 
 
         /** ======================    Adding observers to ContactManager    =============================== */
 
+        /** Observer responsible for updating the contact list */
+        this.chatSystem.getContactsManager().addObserver(new ContactsManager.Observer() {
 
-        this.CS.getContactsManager().addObserver(new ContactsManager.Observer() {
+            /** Adds a contact to the list whenever a contact is discovered on the network */
             @Override
             public void addContact(Contact contact) {
                 ContactItem contactItem = new ContactItem(contact);
@@ -147,20 +147,20 @@ public class GUI {
                         super.mouseClicked(e);
                         currentContact = contact;
                         try {
-                            ArrayList<ChatMessage> messList = CS.getChatHistoryManager().getHistoryOf(currentContact.getId(), CS.getMonContact().getId());
-                            CH.flushHistory();
-                            CH.loadHistory(messList, CS.getMonContact().getId());
+                            ArrayList<ChatMessage> messList = chatSystem.getChatHistoryManager().getHistoryOf(currentContact.getId(), chatSystem.getMonContact().getId());
+                            chatHistory.flushHistory();
+                            chatHistory.loadHistory(messList, chatSystem.getMonContact().getId());
                         } catch (SQLException ex) {
                             throw new RuntimeException(ex);
                         }
                     }
                 });
 
-
                 contactListInnerPanel.revalidate();
                 contactListInnerPanel.repaint();
             }
 
+            /** Updates a contact's pseudo, ip or online mark whenever it changes */
             @Override
             public void updateContact(Contact contact) {
                 Component[] ContactComponentList = contactListInnerPanel.getComponents();
@@ -182,15 +182,17 @@ public class GUI {
             }
         });
 
+
         /** ======================    Adding observers to TcpServer    =============================== */
 
-        this.CS.getTcpServer().addObserver((received, ipSender) -> {
-            int otherID = this.CS.getContactsManager().searchContactByIP(ipSender.getHostAddress()).getId();
-            int myId = this.CS.getMonContact().getId();
+        /** Adds a new message in the chat history when received */
+        this.chatSystem.getTcpServer().addObserver((received, ipSender) -> {
+            int otherID = this.chatSystem.getContactsManager().searchContactByIP(ipSender.getHostAddress()).getId();
+            int myId = this.chatSystem.getMonContact().getId();
             try {
-                this.CS.getChatHistoryManager().insertMessage(otherID, myId, received);
+                this.chatSystem.getChatHistoryManager().insertMessage(otherID, myId, received);
                 if(this.currentContact != null && otherID == this.currentContact.getId()){
-                    CH.addReceivedMessage(new ChatMessage(otherID, myId, received, LocalDateTime.now()));
+                    chatHistory.addReceivedMessage(new ChatMessage(otherID, myId, received, LocalDateTime.now()));
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -200,26 +202,19 @@ public class GUI {
 
         /** ======================    Action Listeners Implementation    ================================ */
 
+
+
         /** button to choose pseudo and start chatting */
-
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                CS.closeChat();
-                System.exit(0);
-            }
-        });
-
         buttonStartChatting.addActionListener(e -> {
             String askedPseudo = pseudoField1.getText();
             try {
                 if(!askedPseudo.isEmpty()){
-                    CS.choosePseudo(askedPseudo);
-                    CS.getMonContact().setPseudo(askedPseudo);
-                    CS.getUpdateContactListThread().setName("UCT Thread - " + askedPseudo);
-                    CS.getContactsManager().setMonContact(CS.getMonContact());
+                    chatSystem.choosePseudo(askedPseudo);
+                    chatSystem.getMonContact().setPseudo(askedPseudo);
+                    chatSystem.getUpdateContactListThread().setName("UCT Thread - " + askedPseudo);
+                    chatSystem.getContactsManager().setMonContact(chatSystem.getMonContact());
                     LOGGER.trace("Chatsystem " + askedPseudo + " started correctly");
-                    contactListTitle.setText("Connected as " + CS.getMonContact().getPseudo());
+                    contactListTitle.setText("Connected as " + chatSystem.getMonContact().getPseudo());
                     loginInfo.setText("");
                     viewManager.setViewOfFrame(frame, Chatting);
                 }else{
@@ -237,14 +232,14 @@ public class GUI {
             String askedPseudo = pseudoFieldd.getText();
             try {
                 if(!askedPseudo.isEmpty()){
-                    CS.changePseudo(askedPseudo);
-                    CS.getMonContact().setPseudo(askedPseudo);
-                    CS.getUpdateContactListThread().setName("UCT Thread - " + askedPseudo);
-                    CS.getContactsManager().setMonContact(CS.getMonContact());
+                    chatSystem.changePseudo(askedPseudo);
+                    chatSystem.getMonContact().setPseudo(askedPseudo);
+                    chatSystem.getUpdateContactListThread().setName("UCT Thread - " + askedPseudo);
+                    chatSystem.getContactsManager().setMonContact(chatSystem.getMonContact());
                     LOGGER.trace("Chatsystem " + askedPseudo + " changed correctly");
                     pseudoFieldd.setText("");
                     infoChangePseudo.setText("");
-                    contactListTitle.setText("Connected as " + CS.getMonContact().getPseudo());
+                    contactListTitle.setText("Connected as " + chatSystem.getMonContact().getPseudo());
                 }else{
                     infoChangePseudo.setText("Please enter a pseudo");
                 }
@@ -265,16 +260,25 @@ public class GUI {
                 } else if (this.currentContact == null) {
                     infoChangePseudo.setText("Please choose a contact to chat with");
                 } else {
-                    int myID = this.CS.getMonContact().getId();
+                    int myID = this.chatSystem.getMonContact().getId();
                     int otherID = this.currentContact.getId();
-                    this.currentContact.sendMessageTCP(message, this.CS.PORT_TCP);
-                    this.CS.getChatHistoryManager().insertMessage(myID, otherID, message);
-                    CH.addSentMessage(new ChatMessage(myID, otherID, message, LocalDateTime.now()));
+                    this.currentContact.sendMessageTCP(message, this.chatSystem.PORT_TCP);
+                    this.chatSystem.getChatHistoryManager().insertMessage(myID, otherID, message);
+                    chatHistory.addSentMessage(new ChatMessage(myID, otherID, message, LocalDateTime.now()));
                 }
             }catch(Exception ex){
                 throw new RuntimeException(ex);
             }
-            // TODO: get sender id and receiver's
+        });
+
+
+        /** Closes the ChatSystem when the window is closed */
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                chatSystem.closeChat();
+                System.exit(0);
+            }
         });
 
         frame.setVisible(true);
@@ -282,20 +286,18 @@ public class GUI {
     }
 
 
+    /** Starts the ChatSystem and shows the GUI */
     public void start() {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
 
                 createAndShowGUI();
-                CS.start();
-                LOGGER.info("Showing gui");
+                chatSystem.start();
+                LOGGER.info("Showing GUI");
 
             }
         });
 
     }
-
-
-    /** A few ActionListeners definitions */
 
 }
