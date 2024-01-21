@@ -37,9 +37,19 @@ Après compilation, pour lancer le système de chat il faut éxécuter `java -ja
 
 Pour utiliser notre système de chat de manière optimale, il est important de suivre les recommandations suivantes : 
 - Lancer l'application sur plusieurs machines distinctes d'un même réseau local, sinon les applications vont tenter d'utiliser le même port et seule une instance sera lancée. Cela peut être résolu avec la commande `ssh -X <username>@<hostname>`.
-- Lancer l'application depuis des chemins distincts, sinon la même base de données sera utilisée par les deux instances et les messages apparaîtront en double dans l'interface. Par exemple `~/instance1$ java -jar target/ChatSystem-1.0-jar-with-dependencies.jar` et `~/instance2$ java -jar target/ChatSystem-1.0-jar-with-dependencies.jar`.
+- Lancer l'application depuis des chemins distincts, sinon la même base de données sera utilisée par les deux instances et les messages apparaîtront en double dans l'interface. Par exemple `~/instance1/chatsystem-ramara-barnavon$ java -jar target/ChatSystem-1.0-jar-with-dependencies.jar` et `~/instance2/chatsystem-ramara-barnavon$ java -jar target/ChatSystem-1.0-jar-with-dependencies.jar`.
+
 
 # Fonctionnalités
+
+Notre système de chat inclus les fonctionnalités suivantes à partir d'une interface graphique Swing : 
+- Choix d'un pseudo unique
+- Affichage de la liste des contacts avec qui il est possible de démarrer un chat
+- Mise à jour en temps réel de la liste des contacts avec une pastille indiquant si le contact est en ligne ou non
+- Possibilité d'envoyer une message à tous les contacts en ligne de la liste (ET MEME LES INACTIFS ATTENTION)
+- L'historique de chaque conversation est conservé dans une base de données locale
+- Même après déconnexion d'un contact, il n'est pas possible pour quelqu'un d'autre de se connecter avec le même pseudo (A VOIR AVEC l'IP) pour éviter l'usurpation d'identité
+
 # Pile Technologique
 # Politique de Test
 # Points Forts
