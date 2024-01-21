@@ -11,13 +11,11 @@ import java.awt.event.MouseEvent;
 public class ContactItem extends JPanel {
     JLabel pseudo;
     JLabel onlineMark;
-    JPanel chat; // corresponding chat view
     Contact contact;
 
     public ContactItem(Contact contact){
         super(new FlowLayout());
         this.contact = contact;
-        this.chat = new JPanel(new BorderLayout());
         this.pseudo = new JLabel(this.contact.getPseudo());
         this.onlineMark = new JLabel();
         setMaximumSize(new Dimension(1000, 20));
@@ -74,9 +72,6 @@ public class ContactItem extends JPanel {
         }
     }
 
-    public JPanel getChat(){
-        return this.chat;
-    }
 
     public Contact getContact() {
         return contact;
