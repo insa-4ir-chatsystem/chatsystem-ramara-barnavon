@@ -9,6 +9,9 @@ import org.apache.logging.log4j.core.config.Configurator;
 
 public class Main {
 
+    // TODO: Display ID in addition to the pseudo ?
+    // Some synchronized keywords might be useless in the ChatSystem
+
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
     public static void main(String[] args) {
 
