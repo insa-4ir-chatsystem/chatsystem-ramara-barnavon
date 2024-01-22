@@ -9,9 +9,9 @@ import java.awt.event.MouseEvent;
 
 /** A ContactItem is the element showing the contact in the list of Contacts */
 public class ContactItem extends JPanel {
-    JLabel pseudo;
-    JLabel onlineMark;
-    Contact contact;
+    private JLabel pseudo;
+    private JLabel onlineMark;
+    private Contact contact;
 
     public ContactItem(Contact contact){
         super(new FlowLayout());
