@@ -19,11 +19,9 @@ public class TCP_Server extends Thread {
     private final List<TCP_Server.Observer> observers = new ArrayList<>();
 
 
-    //private final List<TCP_Server.Observer> observers = new ArrayList<>();
 
-    /**
-     * Interface that observe of the TCP server must implement.
-     */
+
+    /** This class is used to receive TCP message from multiple user and open a thread (TCP_Session) for each one. */
 
 
     public TCP_Server(int port) throws SocketException, UnknownHostException,IOException {
@@ -48,10 +46,9 @@ public class TCP_Server extends Thread {
                 clientSocket = serverSocket.accept();
 
 
-                // TODO: créer un thread pour toutes les connections entrantes
-                //Todo : Il faut avoir l'id du sender
+
                 TCP_Session thread_session = new TCP_Session(clientSocket);
-                /** Lorsque j'observe un de mes TCP_Session remonter un message, je le remonte moi-même à ChatSystem*/
+                /** When it observes a message from a session, it gives the message to the Server */
                 thread_session.addObserver((received, ipSender ) -> { synchronized (this.observers) {
 
                     for (TCP_Server.Observer obs : this.observers) {
@@ -77,7 +74,7 @@ public class TCP_Server extends Thread {
 
     }
     public void close() throws IOException{
-        //TODO:Faire en sorte de fermer tous les thread sessions sans les stocker
+
         /** close everything */
             serverSocket.close();
             this.interrupt();

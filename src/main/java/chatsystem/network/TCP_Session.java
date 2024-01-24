@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Thread qui doit être lancé pour chaque session de chat actif avec quelqu'un du rezo */
+/** Thread that is launch for every active user that contact us with TCP  */
 public class TCP_Session extends Thread {
     /** Attribute */
     private static final Logger LOGGER = LogManager.getLogger(TCP_Session.class);
@@ -19,6 +19,7 @@ public class TCP_Session extends Thread {
     private BufferedReader in;
     private final List<TCP_Session.Observer> observers = new ArrayList<>();
     private final InetAddress ipSender;
+
     /** Constructor */
     public TCP_Session(Socket clientSocket) {
         this.clientSocket = clientSocket;
@@ -47,7 +48,7 @@ public class TCP_Session extends Thread {
         return message;
     }
     public void close() throws IOException{
-        /** close everything */
+
 
         in.close();
         clientSocket.close();

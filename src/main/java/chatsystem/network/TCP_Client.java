@@ -12,7 +12,7 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/** This class is used to send a TCP Message */
 public class TCP_Client {
     private Socket clientSocket;
     private PrintWriter out;
@@ -29,7 +29,7 @@ public class TCP_Client {
         }
 
     }
-
+    /** Send a message through the open socket */
     public void sendMessage(String msg) throws IOException{
         out.println(msg);
 
@@ -37,7 +37,6 @@ public class TCP_Client {
     }
 
     public void stopConnection() throws IOException {
-
         out.close();
         clientSocket.close();
     }

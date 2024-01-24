@@ -67,6 +67,7 @@ public class UDP_Client {
         send(addr, destPort, msg_to_send);
     }
 
+    /** [OLD] Used when we were working only on localhost */
     public static void sendLocalhost(int port, String message) throws IOException {
         UDP_Client.send(InetAddress.getLocalHost(), port, message);
     }
