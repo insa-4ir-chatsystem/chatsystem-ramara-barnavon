@@ -1,5 +1,6 @@
 # Projet Chat System
 RAMARA Matis
+
 BARNAVON Jules-Ian
 
 # Pile Technologique
@@ -19,8 +20,9 @@ Pour l'interface graphique, nous avons décidé d'utiliser Swing, car nous poss�
 
 
 # Politique de Test
-Au commencement du projet, nous avions seulement fait le projet sur le localhost, en simulant plusieurs machines sur des ports différents, à ce moment là, un avantage remarquable qu'on avait a été que nous pouvions effectuer des tests en fonction de toute les machines du "réseaux" car notre main avait un accès direct à l'état de chaque machine, cependant lorsque nous avons du passer sur un vrai réseau, avec des machines différentes, impossible de connaître l'état des autres machines lors du test sur notre machine, et ainsi nous avons retiré ces tests qui n'avait plus de sens.
-Cependant, on pouvait toujours faire les tests locaux à la machine, comme ceux sur la database et l'historique des messages, que nous avons mis en place après avoir crée la fonction testé.
+
+Au commencement du projet, nous avions seulement fait le système de chat en localhost, en simulant plusieurs machines sur des ports différents. A ce moment là, un avantage remarquable qu'on avait a été que nous pouvions effectuer des tests en fonction de toute les instances du ChatSystem sur la machine car notre classe **Main** avait un accès direct à l'état de chaque **ChatSystem**. Nous avons donc pu écrire des tests pour les fonctions principales du **ChatSystem** telles que choosePseudo et chooseId cependant lorsque nous avons du passer sur un vrai réseau local avec des machines différentes, impossible de connaître l'état des autres machines lors du test sur notre machine, et ainsi nous avons retiré ces tests qui n'avaient plus de sens.
+Cependant, nous pouvions toujours faire les tests locaux à la machine, comme ceux sur la database et l'historique des messages, que nous avons mis en place après avoir créé la fonction à tester.
 
 # Points Forts
 
