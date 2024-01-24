@@ -54,7 +54,7 @@ Notre système de chat inclus les fonctionnalités suivantes à partir d'une int
 
 ## Protocole de communication
 
-Pour que notre système de chat soit en mesure de communiquer nous avons du choisir quel protocole utiliser entre UDP et TCP. D'un point de vue réseau, notre système comporte deux phases : une phase de découverte des contacts et une phase où l'utilisateur peut communiquer avec les contacts de sa liste. Pour la première, étant donné que l'application ne connaît pas les utilisateurs présents sur le réseau, elle ne peut pas établir de connexion TCP avec chacun d'eux. C'est pourquoi nous avons utilisé UDP ici avec des communications majoritairement en broadcast. Une fois que l'application détient une liste de contacts avec leur adresse IP, il est possible de les contacter en utilisant le protocole TCP. TCP permet d'être sûr que les utilisateurs recevront bien tous les messages qui leur étaient destinés. 
+Pour que notre système de chat soit en mesure de communiquer nous avons du choisir quel protocole utiliser entre UDP et TCP. D'un point de vue réseau, notre système comporte deux phases : une phase de découverte des contacts et une phase où l'utilisateur peut communiquer avec les contacts de sa liste. Pour la première, étant donné que l'application ne connaît pas les utilisateurs présents sur le réseau, elle ne peut pas établir de connexion TCP avec chacun d'eux. C'est pourquoi nous avons utilisé UDP ici avec des communications majoritairement en broadcast. Une fois que l'application détient une liste de contacts avec leur adresse IP, il est possible de les contacter individuellement en utilisant le protocole TCP. TCP permet d'être sûr que les utilisateurs recevront bien tous les messages qui leur étaient destinés. 
 
 
 ## Base de données
@@ -67,7 +67,13 @@ Pour l'interface graphique, nous avons décidé d'utiliser Swing, car nous poss�
 
 
 # Politique de Test
+
+
 # Points Forts
+
+Toutes les requêtes sur la base de données sont faites grâce aux méthodes (qui ne sont pas synchronisées car SQLite s'en charge lui-même) de la class ChatHistoryManager de manière à éviter toute injection SQL par l'utilisation de PreparedStatements.
+
+Lors de la création de l'interface graphique nous avons eu à faire un choix quant à la gestion de l'affichage de l'historique. La première option était de garder un ChatHistory (JPanel) par contact et d'afficher seulement celui qui correspondait au contact sélectionné. Cette option était envisageable pour un environnement avec peu d'utilisateurs simultanés, mais aurait requis beaucoup de mémoire si l'on avait beaucoup d'utilisateurs. Nous avons préféré utiliser un seul composant qui est rafraîchi avec les messages de la base de données à chaque fois que l'utilisateur sélectionne un nouveau contact. Ce système est ainsi moins gourmand en mémoire vive et peut être amélioré par la suite si besoin.
 
 ## Détails sur notre projet
 
