@@ -51,6 +51,21 @@ Notre système de chat inclus les fonctionnalités suivantes à partir d'une int
 - Même après déconnexion d'un contact, il n'est pas possible pour quelqu'un d'autre de se connecter avec le même pseudo (A VOIR AVEC l'IP) pour éviter l'usurpation d'identité
 
 # Pile Technologique
+
+## Protocole de communication
+
+Pour que notre système de chat soit en mesure de communiquer nous avons du choisir quel protocole utiliser entre UDP et TCP. D'un point de vue réseau, notre système comporte deux phases : une phase de découverte des contacts et une phase où l'utilisateur peut communiquer avec les contacts de sa liste. Pour la première, étant donné que l'application ne connaît pas les utilisateurs présents sur le réseau, elle ne peut pas établir de connexion TCP avec chacun d'eux. C'est pourquoi nous avons utilisé UDP ici avec des communications majoritairement en broadcast. Une fois que l'application détient une liste de contacts avec leur adresse IP, il est possible de les contacter en utilisant le protocole TCP. TCP permet d'être sûr que les utilisateurs recevront bien tous les messages qui leur étaient destinés. 
+
+
+## Base de données
+
+Afin de sauvegarder les messages échangés entre l'utilisateur et ses contacts nous avons eu recours à l'utilisation du base de données. L'utilisation du système de gestion de bases de données SQLite s'est rapidement imposée pour plusieurs raisons. SQLite permet de créer des bases de données locales sans avoir de serveur tournant sur la machine. Il a été très rapide de déployer la base de données, après avoir ajouté la dépendance et écrit une classe pour générer les requêtes, la base de données pouvait déjà être intégrée à l'application. De plus notre projet ne nécessitait pas de technologie plus performante comme MySQL qui permet de gérer beaucoup plus d'accès concurrents et une meilleure scalabilité.
+
+## Interface graphique
+
+Pour l'interface graphique, nous avons décidé d'utiliser Swing, car nous possédions des bases dans l'utilisation de cette bibliothèque depuis le cours de PDLA/Conduite de projet. Une alternative à Swing était JavaFX mais notre objectif n'était pas de faire l'interface graphique la plus esthétique et Swing était largement suffisant pour cela. De par son ancienneté, il a été très facile de trouver de l'aide en ligne pour certains problèmes rencontrés avec Swing.
+
+
 # Politique de Test
 # Points Forts
 
