@@ -46,22 +46,6 @@ Notre système de chat inclus les fonctionnalités suivantes à partir d'une int
 - Choix d'un pseudo unique
 - Affichage de la liste des contacts avec qui il est possible de démarrer un chat
 - Mise à jour en temps réel de la liste des contacts avec une pastille indiquant si le contact est en ligne ou non
-- Possibilité d'envoyer une message à tous les contacts en ligne de la liste (ET MEME LES INACTIFS ATTENTION)
+- Possibilité d'envoyer une message à tous les contacts en ligne de la liste 
 - L'historique de chaque conversation est conservé dans une base de données locale
-- Même après déconnexion d'un contact, il n'est pas possible pour quelqu'un d'autre de se connecter avec le même pseudo (A VOIR AVEC l'IP) pour éviter l'usurpation d'identité
-
-
-## Détails sur notre projet
-
-### Remarques UDP
--Les messages échangés entre les chatsystems sont identifiés grâce à un Header de 4 majuscules.\n
--Il y a le thread principal, puis 1 Thread qui est en écoute de messages et un dernier qui met à jour la liste des contacts toutes les secondes grâce à une demande broadcasté au réseau.<br>
--Comme c'est de l'UDP on a mis un ttl(=time to live) de taille n pour ne pas supprimer un contact si il y a n messages qui ont été perdus(ou non envoyé).<br>
-
-## Compilation du projet et exécution
-
-### Compilation
-Pour compiler le projet, il faut se placer dans le dossier **chatsystem-ramara-barnavon** et exécuter la commande `mvn compile package`
-
-### Exécution
-Pour exécuter le projet, lancer `java -jar target/ChatSystem-1.0.jar` toujours dans le même dossier
+- Même après déconnexion d'un contact, il n'est pas possible pour quelqu'un d'autre de se connecter avec le même pseudo pour éviter l'usurpation d'identité
