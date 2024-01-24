@@ -1,0 +1,6 @@
+*.class
+.idea/
+*.jar
+.vscode/
+.run/
+target/*
