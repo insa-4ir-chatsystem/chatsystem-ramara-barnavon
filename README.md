@@ -5,10 +5,6 @@ BARNAVON Jules-Ian
 
 *Ce projet a pour but de créer un système de chat décentralisé, utilisable sur un réseau local pour une entreprise par exemple. Notre implémentation a pour but de satisfaire un maximum de fonctionnalités du [cahier des charges](https://arbimo.github.io/insa-4ir-advanced-prog/docs/requirements.pdf).*
 
-# Table des Matières
-
-- [Utilisation](#utilisation)
-- [Fonctionnalités](#fonctionnalités)
 
 # Utilisation
 
