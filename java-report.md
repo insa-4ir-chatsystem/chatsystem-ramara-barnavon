@@ -3,6 +3,13 @@ RAMARA Matis
 
 BARNAVON Jules-Ian
 
+# Table des matières
+
+- [Pile Technologique](#pile-technologique)
+- [Politique de Test](#politique-de-test)
+- [Points Forts](#points-forts)
+
+
 # Pile Technologique
 
 ## Protocole de communication
