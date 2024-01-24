@@ -267,6 +267,7 @@ public class GUI {
                 } else if (!this.currentContact.isOnline()) {
                     infoChangePseudo.setText("Your contact is offline !");
                 } else {
+                    infoChangePseudo.setText("");
                     int myID = this.chatSystem.getMonContact().getId();
                     int otherID = this.currentContact.getId();
                     this.currentContact.sendMessageTCP(message, this.chatSystem.PORT_TCP);
