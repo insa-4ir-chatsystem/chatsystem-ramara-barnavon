@@ -264,6 +264,8 @@ public class GUI {
                     infoChangePseudo.setText("Please enter a message");
                 } else if (this.currentContact == null) {
                     infoChangePseudo.setText("Please choose a contact to chat with");
+                } else if (!this.currentContact.isOnline()) {
+                    infoChangePseudo.setText("Your contact is offline !");
                 } else {
                     int myID = this.chatSystem.getMonContact().getId();
                     int otherID = this.currentContact.getId();
