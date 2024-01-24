@@ -168,14 +168,14 @@ public class GUI {
                 for(Component cc : ContactComponentList){
                     if (cc instanceof ContactItem){
                         ContactItem ci = (ContactItem) cc;
+                        if(contact.equals(currentContact)){
+                            currentContact = contact;
+                            chattingTitle.setText("Chatting with " + currentContact.getPseudo());
+                        }
                         if(ci.getContact().equals(contact)){
                             ci.setContact(contact);
                             ci.updateContactItem();
                             break;
-                        }
-                        if(contact.equals(currentContact)){
-                            //currentContact = contact;
-                            //chattingTitle.setText("Chatting with " + currentContact.getPseudo());
                         }
                     }
                 }

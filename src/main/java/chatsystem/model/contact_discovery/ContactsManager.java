@@ -115,27 +115,7 @@ public class ContactsManager {
         return null;
     }
 
-    /** Searches a connected contact by its unique ID */
-    public synchronized Contact searchConnectedContactByID(int id){
-        for(Contact c : this.contactList){
-            if (c.getId() == (id) && c.isOnline()){
-                return c;
-            }
-        }
-        return null;
-    }
-
-    /** Searches a contact by its unique pseudo */
-    public synchronized Contact searchConnectedContactByPseudo(String contact){
-        for(Contact c : this.contactList){
-            if (c.getPseudo().equals(contact) && c.isOnline()){
-                return c;
-            }
-        }
-        return null;
-    }
-
-    /** Searches a contact by its unique IP address */
+    /** Searches a connected contact by its unique IP address */
     public synchronized Contact searchConnectedContactByIP(String ip){
         for(Contact c : this.contactList){
             if (c.getIp().equals(ip) && c.isOnline()){
