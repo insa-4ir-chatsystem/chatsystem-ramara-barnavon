@@ -115,6 +115,36 @@ public class ContactsManager {
         return null;
     }
 
+    /** Searches a connected contact by its unique ID */
+    public synchronized Contact searchConnectedContactByID(int id){
+        for(Contact c : this.contactList){
+            if (c.getId() == (id) && c.isOnline()){
+                return c;
+            }
+        }
+        return null;
+    }
+
+    /** Searches a contact by its unique pseudo */
+    public synchronized Contact searchConnectedContactByPseudo(String contact){
+        for(Contact c : this.contactList){
+            if (c.getPseudo().equals(contact) && c.isOnline()){
+                return c;
+            }
+        }
+        return null;
+    }
+
+    /** Searches a contact by its unique IP address */
+    public synchronized Contact searchConnectedContactByIP(String ip){
+        for(Contact c : this.contactList){
+            if (c.getIp().equals(ip) && c.isOnline()){
+                return c;
+            }
+        }
+        return null;
+    }
+
     /** Decreases the TTL of all the contacts of the list */
     public synchronized void decreaseTTL() {
         for(Contact c : this.contactList){

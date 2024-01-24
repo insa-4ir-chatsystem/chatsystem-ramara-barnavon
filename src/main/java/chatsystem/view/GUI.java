@@ -146,6 +146,7 @@ public class GUI {
                     public void mouseClicked(MouseEvent e) {
                         super.mouseClicked(e);
                         currentContact = contact;
+                        chattingTitle.setText("Chatting with " + currentContact.getPseudo());
                         try {
                             ArrayList<ChatMessage> messList = chatSystem.getChatHistoryManager().getHistoryOf(currentContact.getId(), chatSystem.getMonContact().getId());
                             chatHistory.flushHistory();
@@ -160,18 +161,21 @@ public class GUI {
                 contactListInnerPanel.repaint();
             }
 
-            /** Updates a contact's pseudo, ip or online mark whenever it changes */
+            /** Updates a contact's pseudo or online mark whenever it changes */
             @Override
             public void updateContact(Contact contact) {
                 Component[] ContactComponentList = contactListInnerPanel.getComponents();
                 for(Component cc : ContactComponentList){
                     if (cc instanceof ContactItem){
                         ContactItem ci = (ContactItem) cc;
-
                         if(ci.getContact().equals(contact)){
                             ci.setContact(contact);
                             ci.updateContactItem();
                             break;
+                        }
+                        if(contact.equals(currentContact)){
+                            //currentContact = contact;
+                            //chattingTitle.setText("Chatting with " + currentContact.getPseudo());
                         }
                     }
                 }
@@ -187,12 +191,13 @@ public class GUI {
 
         /** Adds a new message in the chat history when received */
         this.chatSystem.getTcpServer().addObserver((received, ipSender) -> {
-            int otherID = this.chatSystem.getContactsManager().searchContactByIP(ipSender.getHostAddress()).getId();
+            int otherID = this.chatSystem.getContactsManager().searchConnectedContactByIP(ipSender.getHostAddress()).getId();
             int myId = this.chatSystem.getMonContact().getId();
             try {
                 this.chatSystem.getChatHistoryManager().insertMessage(otherID, myId, received);
                 if(this.currentContact != null && otherID == this.currentContact.getId()){
-                    chatHistory.addReceivedMessage(new ChatMessage(otherID, myId, received, LocalDateTime.now()));
+                    chatHistory.flushHistory();
+                    chatHistory.loadHistory(chatSystem.getChatHistoryManager().getHistoryOf(otherID, myId), myId);
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
